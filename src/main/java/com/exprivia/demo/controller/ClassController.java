@@ -10,10 +10,10 @@ import com.exprivia.demo.service.ClassService;
 @RequestMapping(path = "classe")
 public class ClassController {
 
-	private final ClassService classService;
+	private final ClassService service;
 
 	@Autowired
-	public ClassController(ClassService classService) {
-		this.classService = classService;
+	public ClassController(ClassService service) {
+		this.service = service;
 	}
 }
