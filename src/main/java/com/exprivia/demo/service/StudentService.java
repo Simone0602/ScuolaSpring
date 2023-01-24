@@ -43,22 +43,22 @@ public class StudentService {
 	public String addStudent(StudenteDto studenteDto) {
 		Studente studente = new Studente();
 
-		studente.setNome(studenteDto.getNome());
-		studente.setCognome(studenteDto.getCognome());
-		studente.setUserCode(studenteDto.getUserCode());
-		studente.setMail(studenteDto.getMail());
-		studente.setPas(studenteDto.getPas());
-
 		if(!repository.existsById(studenteDto.getId())) {
+			studente.setNome(studenteDto.getNome());
+			studente.setCognome(studenteDto.getCognome());
+			studente.setUserCode(studenteDto.getUserCode());
+			studente.setMail(studenteDto.getMail());
+			studente.setPas(studenteDto.getPas());
+			
 			repository.save(studente);
 			return "Studente salvato";
 		}
 		return "Studente già presente";
 	}
 
-	public Studente modStudent(StudenteDto studenteDto) {
-
-		Studente studente = new Studente();
+	public Studente updateStudent(StudenteDto studenteDto) {
+		Studente studente = repository.findStudentById(studenteDto.getId())
+				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
 
 		studente.setId(studenteDto.getId());
 		studente.setNome(studenteDto.getNome());
@@ -71,7 +71,12 @@ public class StudentService {
 
 	}
 
-	public void delStudent(long id) {
-		repository.deleteById(id);
+	public String deleteStudent(long id) {
+		if (repository.findStudentById(id).isPresent()) {
+			repository.deleteById(id);
+			return "utente eliminato";
+		}
+		return "Utente non presente";
+
 	}
 }
