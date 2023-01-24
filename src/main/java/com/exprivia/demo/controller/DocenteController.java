@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.model.Docente;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.service.DocenteService;
 
@@ -28,25 +29,25 @@ public class DocenteController {
 		this.service = service;
 	}
 	
-	@GetMapping(path = "/dget")
+	@GetMapping(path = "/get")
 	public ResponseEntity<List<DocenteDto>> getAllDocenti() {
 		List<DocenteDto> docenti = service.findAllDocenti();
 		return new ResponseEntity<>(docenti, HttpStatus.OK);
 	}
 	
-	@PostMapping(path = "/dadd")
-	public ResponseEntity<Studente> addStudent(@RequestBody StudenteDto studenteDto) {
-		Studente studente = service.addStudent(studenteDto);
-		return new ResponseEntity<>(studente, HttpStatus.CREATED);
+	@PostMapping(path = "/add")
+	public ResponseEntity<String> addDocente(@RequestBody DocenteDto docenteDto) {
+		String messaggio = service.addDocente(docenteDto);
+		return new ResponseEntity<>(messaggio, HttpStatus.CREATED);
 	}
 
-	@PutMapping(path = "/dmod")
-	public ResponseEntity<Studente> modStudent(@RequestBody StudenteDto studenteDto) {
-		Studente studente = service.modStudent(studenteDto);
-		return new ResponseEntity<>(studente, HttpStatus.CREATED);
+	@PutMapping(path = "/update")
+	public ResponseEntity<Studente> updateDocente(@RequestBody DocenteDto docenteDto) {
+		Docente docente = service.updateDocente(docenteDto);
+		return new ResponseEntity<>(docente, HttpStatus.CREATED);
 	}
 
-	@DeleteMapping(path = "/ddel/{id}")
+	@DeleteMapping(path = "/delete/{id}")
 	public ResponseEntity<?> delStudent(@PathVariable("id") long id) {
 		service.delStudent(id);
 		return new ResponseEntity<>(HttpStatus.OK);

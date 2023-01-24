@@ -6,9 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.DocenteDto;
-import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.model.Docente;
-import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.DocenteRepo;
 
 @Service
@@ -33,6 +31,7 @@ public class DocenteService {
 			docenteDto.setCognome(docente.getCognome());
 			docenteDto.setMail(docente.getMail());
 			docenteDto.setPas(" ");
+			docenteDto.setMateria(docente.getMateria());
 
 			docentiDto.add(docenteDto);
 
@@ -40,7 +39,26 @@ public class DocenteService {
 
 		return docentiDto;
 	}
-	
-	
-	
+
+	public String addDocente(DocenteDto docenteDto) {
+		Docente docente = new Docente();
+
+		docente.setNome(docenteDto.getNome());
+		docente.setCognome(docenteDto.getCognome());
+		docente.setMail(docenteDto.getMail());
+		docente.setPas(docenteDto.getPas());
+		docente.setMateria(docenteDto.getMateria());
+
+		if (!drepository.existsById(docenteDto.getId())) {
+			drepository.save(docente);
+			return "Docente salvato";
+		}
+		return "Docente già presente";
+	}
+
+	public Docente updateDocente(DocenteDto docenteDto) {
+
+		return null;
+	}
+
 }
