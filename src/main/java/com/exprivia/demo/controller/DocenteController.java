@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.service.DocenteService;
@@ -28,9 +29,9 @@ public class DocenteController {
 	}
 	
 	@GetMapping(path = "/dget")
-	public ResponseEntity<List<StudenteDto>> getAllStudent() {
-		List<StudenteDto> studenti = service.findAllStudent();
-		return new ResponseEntity<>(studenti, HttpStatus.OK);
+	public ResponseEntity<List<DocenteDto>> getAllDocenti() {
+		List<DocenteDto> docenti = service.findAllDocenti();
+		return new ResponseEntity<>(docenti, HttpStatus.OK);
 	}
 	
 	@PostMapping(path = "/dadd")
