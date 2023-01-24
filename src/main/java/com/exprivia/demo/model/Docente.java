@@ -91,8 +91,4 @@ public class Docente {
 		return "Docente [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas=" + getPas() + ", materia="
 				+ getMateria() + "]";
 	}
-	
-	
-	
-	
 }

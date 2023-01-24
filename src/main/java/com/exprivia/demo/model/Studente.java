@@ -26,19 +26,19 @@ public class Studente {
 	@Column(name = "password")
 	private String pas;
 	@Column(name = "user_code", length = 6)
-	private String user;
+	private String userCode;
 	
 
 	public Studente() {
 	}
 	
-	public Studente(String nome, String cognome, String mail, String pas, String user) {
+	public Studente(String nome, String cognome, String mail, String pas, String userCode) {
 		super();
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.pas = pas;
-		this.user = user;
+		this.userCode = userCode;
 	}
 
 	public long getId() {
@@ -81,18 +81,18 @@ public class Studente {
 		this.pas = pas;
 	}
 
-	public String getUser() {
-		return user;
+	public String getUserCode() {
+		return userCode;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUserCode(String user) {
+		this.userCode = user;
 	}
 
 	@Override
 	public String toString() {
 		return "Studente [getId()=" + getId() + ", getNome()=" + getNome() + ", getCognome()=" + getCognome()
-				+ ", getMail()=" + getMail() + ", getPas()=" + getPas() + ", getUser()=" + getUser() + "]";
+				+ ", getMail()=" + getMail() + ", getPas()=" + getPas() + ", getUser()=" + getUserCode() + "]";
 	}
 
 }
