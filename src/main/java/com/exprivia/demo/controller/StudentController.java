@@ -26,6 +26,8 @@ public class StudentController {
 	public StudentController(StudentService service) {
 		this.service = service;
 	}
+	
+	
 
 	@GetMapping(path = "/get")
 	public ResponseEntity<List<StudenteDto>> getAllStudent() {
