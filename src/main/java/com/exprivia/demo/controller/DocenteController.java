@@ -18,13 +18,13 @@ import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.service.DocenteService;
 
 @RestController
-@RequestMapping (value = "/doce")
+@RequestMapping(path = "docente")
 public class DocenteController {
 	
-	private final DocenteService dservice;
+	private final DocenteService service;
 
-	public DocenteController(DocenteService dservice) {
-		this.dservice = dservice;
+	public DocenteController(DocenteService service) {
+		this.service = service;
 	}
 	
 	@GetMapping(path = "/dget")

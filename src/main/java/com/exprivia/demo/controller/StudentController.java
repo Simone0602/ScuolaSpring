@@ -18,7 +18,7 @@ import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.service.StudentService;
 
 @RestController
-@RequestMapping(value = "/crud")
+@RequestMapping(path = "studente")
 public class StudentController {
 
 	private final StudentService service;
@@ -27,27 +27,25 @@ public class StudentController {
 		this.service = service;
 	}
 	
-	
-
-	@GetMapping(path = "/get")
+	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<StudenteDto>> getAllStudent() {
 		List<StudenteDto> studenti = service.findAllStudent();
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
 
 	@PostMapping(path = "/add")
-	public ResponseEntity<Studente> addStudent(@RequestBody StudenteDto studenteDto) {
-		Studente studente = service.addStudent(studenteDto);
-		return new ResponseEntity<>(studente, HttpStatus.CREATED);
+	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto) {
+		String message = service.addStudent(studenteDto);
+		return new ResponseEntity<>(message, HttpStatus.CREATED);
 	}
 
-	@PutMapping(path = "/mod")
+	@PutMapping(path = "/update")
 	public ResponseEntity<Studente> modStudent(@RequestBody StudenteDto studenteDto) {
 		Studente studente = service.modStudent(studenteDto);
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
 
-	@DeleteMapping(path = "/del/{id}")
+	@DeleteMapping(path = "/delete/{id}")
 	public ResponseEntity<?> delStudent(@PathVariable("id") long id) {
 		service.delStudent(id);
 		return new ResponseEntity<>(HttpStatus.OK);

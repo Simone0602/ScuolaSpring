@@ -40,8 +40,7 @@ public class StudentService {
 		return studentiDto;
 	}
 
-	public Studente addStudent(StudenteDto studenteDto) {
-
+	public String addStudent(StudenteDto studenteDto) {
 		Studente studente = new Studente();
 
 		studente.setNome(studenteDto.getNome());
@@ -50,8 +49,11 @@ public class StudentService {
 		studente.setMail(studenteDto.getMail());
 		studente.setPas(studenteDto.getPas());
 
-		return repository.save(studente);
-
+		if(!repository.existsById(studenteDto.getId())) {
+			repository.save(studente);
+			return "Studente salvato";
+		}
+		return "Studente già presente";
 	}
 
 	public Studente modStudent(StudenteDto studenteDto) {
