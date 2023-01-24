@@ -1,10 +1,15 @@
 package com.exprivia.demo.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -14,6 +19,8 @@ public class Classe {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
 	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
+
+	@Column(name = "classe_id")
 	private Long id;
 	@Column(name = "sezione")
 	private String sezione;
@@ -21,6 +28,9 @@ public class Classe {
 	private String cordinatore;
 	@Column(name = "aula")
 	private String aula;
+	@OneToMany(mappedBy = "classe")
+	@JsonManagedReference
+	private List<Studente> studenti;
 
 	public Classe() {
 	}

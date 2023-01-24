@@ -6,20 +6,22 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.DocenteDto;
+import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.model.Docente;
+import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.DocenteRepo;
 
 @Service
 public class DocenteService {
 
-	private final DocenteRepo drepository;
+	private final DocenteRepo repository;
 
-	public DocenteService(DocenteRepo drepository) {
-		this.drepository = drepository;
+	public DocenteService(DocenteRepo repository) {
+		this.repository = repository;
 	}
 
 	public List<DocenteDto> findAllDocenti() {
-		List<Docente> docenti = drepository.findAll();
+		List<Docente> docenti = repository.findAll();
 		List<DocenteDto> docentiDto = new ArrayList<>();
 
 		for (Docente docente : docenti) {
@@ -49,16 +51,39 @@ public class DocenteService {
 		docente.setPas(docenteDto.getPas());
 		docente.setMateria(docenteDto.getMateria());
 
-		if (!drepository.existsById(docenteDto.getId())) {
-			drepository.save(docente);
+		if (!repository.existsById(docenteDto.getId())) {
+			repository.save(docente);
 			return "Docente salvato";
 		}
 		return "Docente già presente";
 	}
 
-	public Docente updateDocente(DocenteDto docenteDto) {
+	public DocenteDto updateDocente(DocenteDto docenteDto) {
 
-		return null;
+		DocenteDto newDocenteDto = new DocenteDto();
+		Docente docente = repository.findDocenteById(docenteDto.getId())
+				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
+
+		docente.setId(docenteDto.getId());
+		docente.setNome(docenteDto.getNome());
+		docente.setCognome(docenteDto.getCognome());
+		docente.setMail(docenteDto.getMail());
+		docente.setPas(docenteDto.getPas());
+		docente.setMateria(docenteDto.getMateria());
+
+		repository.save(docente);
+		
+		docente = repository.findDocenteById(docenteDto.getId())
+				.orElseThrow(() -> new RuntimeException("Utente non esistente")); 
+		
+		newDocenteDto.setNome(docente.getNome());
+		newDocenteDto.setCognome(docente.getCognome());
+		newDocenteDto.setMail(docente.getMail());
+		newDocenteDto.setPas(null);
+		newDocenteDto.setMateria(docente.getMateria());
+		
+		return newDocenteDto;
+
 	}
 
 }

@@ -56,7 +56,8 @@ public class StudentService {
 		return "Studente già presente";
 	}
 
-	public Studente updateStudent(StudenteDto studenteDto) {
+	public StudenteDto updateStudent(StudenteDto studenteDto) {
+		StudenteDto newStudenteDto = new StudenteDto();
 		Studente studente = repository.findStudentById(studenteDto.getId())
 				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
 
@@ -67,7 +68,18 @@ public class StudentService {
 		studente.setMail(studenteDto.getMail());
 		studente.setPas(studenteDto.getPas());
 
-		return repository.save(studente);
+		repository.save(studente);
+		
+		studente = repository.findStudentById(studenteDto.getId())
+				.orElseThrow(() -> new RuntimeException("Utente non esistente")); 
+		
+		newStudenteDto.setNome(studente.getNome());
+		newStudenteDto.setCognome(studente.getCognome());
+		newStudenteDto.setUserCode(studente.getUserCode());
+		newStudenteDto.setMail(studente.getMail());
+		newStudenteDto.setPas(null);
+		
+		return newStudenteDto;
 
 	}
 

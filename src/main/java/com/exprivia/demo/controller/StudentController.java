@@ -40,8 +40,8 @@ public class StudentController {
 	}
 
 	@PutMapping(path = "/update")
-	public ResponseEntity<Studente> modStudent(@RequestBody StudenteDto studenteDto) {
-		Studente studente = service.updateStudent(studenteDto);
+	public ResponseEntity<StudenteDto> modStudent(@RequestBody StudenteDto studenteDto) {
+		StudenteDto studente = service.updateStudent(studenteDto);
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
 

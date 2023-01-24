@@ -42,15 +42,14 @@ public class DocenteController {
 	}
 
 	@PutMapping(path = "/update")
-	public ResponseEntity<Studente> updateDocente(@RequestBody DocenteDto docenteDto) {
-		Docente docente = service.updateDocente(docenteDto);
+	public ResponseEntity<DocenteDto> updateDocente(@RequestBody DocenteDto docenteDto) {
+		DocenteDto docente = service.updateDocente(docenteDto);
 		return new ResponseEntity<>(docente, HttpStatus.CREATED);
 	}
 
-	@DeleteMapping(path = "/delete/{id}")
-	public ResponseEntity<?> delStudent(@PathVariable("id") long id) {
-		service.delStudent(id);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-
+	/*
+	 * @DeleteMapping(path = "/delete/{id}") public ResponseEntity<?>
+	 * delStudent(@PathVariable("id") long id) { service.delStudent(id); return new
+	 * ResponseEntity<>(HttpStatus.OK); }
+	 */
 }
