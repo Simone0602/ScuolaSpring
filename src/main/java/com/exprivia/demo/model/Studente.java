@@ -31,8 +31,6 @@ public class Studente {
 
 	public Studente() {
 	}
-
-	
 	
 	public Studente(String nome, String cognome, String mail, String pas, String user) {
 		super();
