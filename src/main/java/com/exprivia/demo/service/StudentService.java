@@ -4,23 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
+import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.StudentRepo;
 
 @Service
 public class StudentService {
 
-	private final StudentRepo repository;
+	private final StudentRepo studentRepository;
+	private final ClassRepository classRepository;
 
-	public StudentService(StudentRepo repository) {
-		this.repository = repository;
+	@Autowired
+	public StudentService(StudentRepo studentRepository, ClassRepository classRepository) {
+		this.studentRepository = studentRepository;
+		this.classRepository = classRepository;
 	}
 
 	public List<StudenteDto> findAllStudent() {
-		List<Studente> studenti = repository.findAll();
+		List<Studente> studenti = studentRepository.findAll();
 		List<StudenteDto> studentiDto = new ArrayList<>();
 
 		for (Studente studente : studenti) {
@@ -32,6 +39,7 @@ public class StudentService {
 			studenteDto.setUserCode(null);
 			studenteDto.setMail(studente.getMail());
 			studenteDto.setPas(null);
+			studenteDto.setSezione(studente.getClasse().getSezione());
 
 			studentiDto.add(studenteDto);
 
@@ -40,17 +48,20 @@ public class StudentService {
 		return studentiDto;
 	}
 
-	public String addStudent(StudenteDto studenteDto) {
+	//FUNGE SOLO PER LA SEGRETERIA
+	public String addStudent(StudenteDto studenteDto, String sezione) {
 		Studente studente = new Studente();
-
-		if(!repository.existsById(studenteDto.getId())) {
+		Classe classe = classRepository.findBySezione(sezione)
+				.orElseThrow();
+		if(!studentRepository.existsByUserCode(studenteDto.getUserCode())) {
 			studente.setNome(studenteDto.getNome());
 			studente.setCognome(studenteDto.getCognome());
 			studente.setUserCode(studenteDto.getUserCode());
 			studente.setMail(studenteDto.getMail());
 			studente.setPas(studenteDto.getPas());
+			studente.setClasse(classe);
 			
-			repository.save(studente);
+			studentRepository.save(studente);
 			return "Studente salvato";
 		}
 		return "Studente già presente";
@@ -58,7 +69,7 @@ public class StudentService {
 
 	public StudenteDto updateStudent(StudenteDto studenteDto) {
 		StudenteDto newStudenteDto = new StudenteDto();
-		Studente studente = repository.findStudentByUserCode(studenteDto.getUserCode())
+		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
 
 		studente.setId(studente.getId());
@@ -67,9 +78,9 @@ public class StudentService {
 		studente.setMail(studenteDto.getMail());
 		studente.setPas(studenteDto.getPas());
 
-		repository.save(studente);
+		studentRepository.save(studente);
 		
-		studente = repository.findStudentByUserCode(studenteDto.getUserCode())
+		studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new RuntimeException("Utente non esistente")); 
 		
 		newStudenteDto.setNome(studente.getNome());
@@ -83,9 +94,9 @@ public class StudentService {
 	}
 
 	public String deleteStudent(String userCode) {
-		Optional<Studente> studente = repository.findStudentByUserCode(userCode);
+		Optional<Studente> studente = studentRepository.findStudentByUserCode(userCode);
 		if (studente.isPresent()) {
-			repository.deleteById(studente.get().getId());
+			studentRepository.deleteById(studente.get().getId());
 			return "utente eliminato";
 		}
 		return "Utente non presente";

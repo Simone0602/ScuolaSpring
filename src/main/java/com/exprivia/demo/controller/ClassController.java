@@ -27,7 +27,6 @@ public class ClassController {
 	
 	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<ClasseDto>> getAllClassi() {
-
 		List<ClasseDto> classi = service.findAllClassi();
 		return new ResponseEntity<>(classi, HttpStatus.OK);
 	}

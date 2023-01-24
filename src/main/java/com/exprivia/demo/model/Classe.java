@@ -6,9 +6,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -19,7 +21,6 @@ public class Classe {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
 	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
-
 	@Column(name = "classe_id")
 	private Long id;
 	@Column(name = "sezione")
@@ -28,16 +29,19 @@ public class Classe {
 	private String cordinatore;
 	@Column(name = "aula")
 	private String aula;
+	
 	@OneToMany(mappedBy = "classe")
 	@JsonManagedReference
 	private List<Studente> studenti;
+	
+	@ManyToMany(mappedBy = "classi", fetch = FetchType.LAZY)
+	private List<Docente> docenti;
 
 	public Classe() {
 	}
 
-	public Classe(Long id, String sezione, String cordinatore, String aula) {
+	public Classe(String sezione, String cordinatore, String aula) {
 		super();
-		this.id = id;
 		this.sezione = sezione;
 		this.cordinatore = cordinatore;
 		this.aula = aula;

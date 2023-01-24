@@ -10,7 +10,6 @@ public class ClasseDto {
 	}
 
 	public ClasseDto(Long id, String sezione, String cordinatore, String aula) {
-		super();
 		this.id = id;
 		this.sezione = sezione;
 		this.cordinatore = cordinatore;

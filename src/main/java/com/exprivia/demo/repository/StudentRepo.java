@@ -10,4 +10,5 @@ public interface StudentRepo extends JpaRepository <Studente, Long>{
 
 	public Optional<Studente> findStudentByUserCode(String userCode);
 
+	public boolean existsByUserCode(String userCode);
 }

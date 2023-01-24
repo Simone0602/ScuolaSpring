@@ -12,4 +12,6 @@ public interface ClassRepository extends JpaRepository<Classe, Long>{
 
 	public Optional <Classe> findClasseById(Long id);
 
+	public Optional<Classe> findBySezione(String sezione);
+
 }

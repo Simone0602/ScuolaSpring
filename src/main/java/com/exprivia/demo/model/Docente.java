@@ -1,10 +1,17 @@
 package com.exprivia.demo.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -15,6 +22,7 @@ public class Docente {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
 	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
+	@Column(name = "docente_id")
 	private long id;
 
 	@Column(name = "nome")
@@ -29,6 +37,17 @@ public class Docente {
 	private String codiceFiscale;
 	@Column(name = "materia")
 	private String materia;
+	
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "docente_classe_table", 
+				joinColumns = {
+						@JoinColumn(name = "docente_id", referencedColumnName = "docente_id")
+				},
+				inverseJoinColumns = {
+						@JoinColumn(name = "classe_id", referencedColumnName = "classe_id")
+				}
+			)
+	private List<Classe> classi;
 
 	public Docente() {
 	}

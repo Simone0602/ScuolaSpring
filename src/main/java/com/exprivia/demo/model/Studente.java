@@ -41,13 +41,21 @@ public class Studente {
 	public Studente() {
 	}
 
-	public Studente(String nome, String cognome, String mail, String pas, String userCode) {
-		super();
+	public Studente(String nome, String cognome, String mail, String pas, String userCode, Classe classe) {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.pas = pas;
 		this.userCode = userCode;
+		this.classe = classe;
+	}
+
+	public Classe getClasse() {
+		return classe;
+	}
+
+	public void setClasse(Classe classe) {
+		this.classe = classe;
 	}
 
 	public long getId() {
