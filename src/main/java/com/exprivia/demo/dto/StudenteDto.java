@@ -7,7 +7,7 @@ public class StudenteDto {
 	private String cognome;
 	private String mail;
 	private String pas;
-	private String user; 
+	private String userCode; 
 	
 	public StudenteDto() {}
 
@@ -41,17 +41,17 @@ public class StudenteDto {
 	public void setPas(String pas) {
 		this.pas = pas;
 	}
-	public String getUser() {
-		return user;
+	public String getUserCode() {
+		return userCode;
 	}
 
-	public void setUser(String user) {
-		this.user = user;
+	public void setUserCode(String userCode) {
+		this.userCode = userCode;
 	}
 	
 	@Override
 	public String toString() {
 		return "Studente [getId()=" + getId() + ", getNome()=" + getNome() + ", getCognome()=" + getCognome()
-				+ ", getMail()=" + getMail() + ", getPas()=" + getPas() + ", getUser()=" + getUser() + "]";
+				+ ", getMail()=" + getMail() + ", getPas()=" + getPas() + ", getUser()=" + getUserCode() + "]";
 	}
 }
