@@ -40,7 +40,8 @@ public class ClassService {
 		ClasseDto newClasseDto = new ClasseDto();
 		Classe classe = repository.findClasseById(classeDto.getId())
 				.orElseThrow(() -> new RuntimeException("Classe non esistente"));
-
+		
+		classe.setId(classeDto.getId());
 		classe.setSezione(classeDto.getSezione());
 		classe.setCordinatore(classeDto.getCordinatore());
 		classe.setAula(classeDto.getAula());
@@ -50,6 +51,7 @@ public class ClassService {
 		classe = repository.findClasseById(classeDto.getId())
 				.orElseThrow(() -> new RuntimeException("Classe non esistente"));
 		
+		newClasseDto.setId(classe.getId());
 		newClasseDto.setSezione(classe.getSezione());
 		newClasseDto.setCordinatore(classe.getCordinatore());
 		newClasseDto.setAula(classe.getAula());
