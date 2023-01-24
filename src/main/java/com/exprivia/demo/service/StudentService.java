@@ -29,7 +29,7 @@ public class StudentService {
 			studenteDto.setId(studente.getId());
 			studenteDto.setNome(studente.getNome());
 			studenteDto.setCognome(studente.getCognome());
-			studenteDto.setUser(studente.getUser());
+			studenteDto.setUserCode(studente.getUserCode());
 			studenteDto.setMail(studente.getMail());
 			studenteDto.setPas(" ");
 
@@ -46,7 +46,7 @@ public class StudentService {
 
 		studente.setNome(studenteDto.getNome());
 		studente.setCognome(studenteDto.getCognome());
-		studente.setUser(studenteDto.getUser());
+		studente.setUserCode(studenteDto.getUserCode());
 		studente.setMail(studenteDto.getMail());
 		studente.setPas(studenteDto.getPas());
 
@@ -61,7 +61,7 @@ public class StudentService {
 		studente.setId(studenteDto.getId());
 		studente.setNome(studenteDto.getNome());
 		studente.setCognome(studenteDto.getCognome());
-		studente.setUser(studenteDto.getUser());
+		studente.setUserCode(studenteDto.getUserCode());
 		studente.setMail(studenteDto.getMail());
 		studente.setPas(studenteDto.getPas());
 
