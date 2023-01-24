@@ -9,7 +9,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "Studenti")
+@Table(name = "studenti")
 public class Studente {
 
 	@Id
@@ -17,15 +17,15 @@ public class Studente {
 	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
 	private long id;
 
-	@Column(name = "Nome")
+	@Column(name = "nome")
 	private String nome;
-	@Column(name = "Cognome")
+	@Column(name = "cognome")
 	private String cognome;
-	@Column(name = "Email")
+	@Column(name = "email")
 	private String mail;
-	@Column(name = "Password")
+	@Column(name = "password")
 	private String pas;
-	@Column(name = "User", length = 6)
+	@Column(name = "user_code", length = 6)
 	private String user;
 	
 
