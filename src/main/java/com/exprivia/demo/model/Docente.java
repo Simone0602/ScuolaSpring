@@ -16,7 +16,7 @@ public class Docente {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
 	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
 	private long id;
-	
+
 	@Column(name = "nome")
 	private String nome;
 	@Column(name = "cognome")
@@ -25,16 +25,23 @@ public class Docente {
 	private String mail;
 	@Column(name = "password")
 	private String pas;
+	@Column(name = "codice_fiscale", length = 16)
+	private String codiceFiscale;
 	@Column(name = "materia")
 	private String materia;
-	
-	public Docente() {}
 
-	public Docente(String nome, String cognome, String mail, String pas, String materia) {
+	public Docente() {
+	}
+
+	public Docente(long id, String nome, String cognome, String mail, String pas, String codiceFiscale,
+			String materia) {
+		super();
+		this.id = id;
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.pas = pas;
+		this.codiceFiscale = codiceFiscale;
 		this.materia = materia;
 	}
 
@@ -86,9 +93,17 @@ public class Docente {
 		this.materia = materia;
 	}
 
+	public String getCodiceFiscale() {
+		return codiceFiscale;
+	}
+
+	public void setCodiceFiscale(String codiceFiscale) {
+		this.codiceFiscale = codiceFiscale;
+	}
+
 	@Override
 	public String toString() {
-		return "Docente [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas=" + getPas() + ", materia="
-				+ getMateria() + "]";
+		return "Docente [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas=" + getPas()
+				+ ", materia=" + getMateria() + "]";
 	}
 }

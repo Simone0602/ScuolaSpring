@@ -10,4 +10,7 @@ public interface DocenteRepo extends JpaRepository <Docente, Long> {
 
 	public Optional <Docente> findDocenteById(long id);
 
+	public boolean existsByCodiceFiscale(String codiceFiscale);
+
+	public Optional<Docente> findDocenteByCodiceFiscale(String codiceFiscale);
 }

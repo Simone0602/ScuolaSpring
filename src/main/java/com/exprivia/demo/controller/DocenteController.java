@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exprivia.demo.dto.DocenteDto;
-import com.exprivia.demo.dto.StudenteDto;
-import com.exprivia.demo.model.Docente;
-import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.service.DocenteService;
 
 @RestController
@@ -29,7 +26,7 @@ public class DocenteController {
 		this.service = service;
 	}
 	
-	@GetMapping(path = "/get")
+	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<DocenteDto>> getAllDocenti() {
 		List<DocenteDto> docenti = service.findAllDocenti();
 		return new ResponseEntity<>(docenti, HttpStatus.OK);
@@ -47,9 +44,9 @@ public class DocenteController {
 		return new ResponseEntity<>(docente, HttpStatus.CREATED);
 	}
 
-	/*
-	 * @DeleteMapping(path = "/delete/{id}") public ResponseEntity<?>
-	 * delStudent(@PathVariable("id") long id) { service.delStudent(id); return new
-	 * ResponseEntity<>(HttpStatus.OK); }
-	 */
+	@DeleteMapping(path = "/delete/{codiceFiscale}") 
+	public ResponseEntity<String> deleteDocente(@PathVariable("codiceFiscale") String codiceFiscale) { 
+		String messaggio = service.deleteDocente(codiceFiscale); 
+		return new ResponseEntity<>(messaggio, HttpStatus.OK); 
+	}
 }

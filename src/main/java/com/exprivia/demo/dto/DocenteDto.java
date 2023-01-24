@@ -8,15 +8,18 @@ public class DocenteDto {
 	private String mail;
 	private String pas;
 	private String materia;
-	
-	public DocenteDto() {}
+	private String codiceFiscale;
 
-	public DocenteDto(String nome, String cognome, String mail, String pas, String materia) {
+	public DocenteDto() {
+	}
+
+	public DocenteDto(String nome, String cognome, String mail, String pas, String materia, String codiceFiscale) {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.pas = pas;
 		this.materia = materia;
+		this.codiceFiscale = codiceFiscale;
 	}
 
 	public long getId() {
@@ -67,12 +70,18 @@ public class DocenteDto {
 		this.materia = materia;
 	}
 
+	public String getCodiceFiscale() {
+		return codiceFiscale;
+	}
+
+	public void setCodiceFiscale(String codiceFiscale) {
+		this.codiceFiscale = codiceFiscale;
+	}
+
 	@Override
 	public String toString() {
-		return "DocenteDto [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas=" + getPas() + ", materia="
-				+ getMateria() + "]";
+		return "DocenteDto [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas="
+				+ getPas() + ", materia=" + getMateria() + "]";
 	}
-	
-	
-	
+
 }

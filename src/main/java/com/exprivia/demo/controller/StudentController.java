@@ -45,9 +45,9 @@ public class StudentController {
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
 
-	@DeleteMapping(path = "/delete/{id}")
-	public ResponseEntity<String> delStudent(@PathVariable("id") long id) {
-		String message = service.deleteStudent(id);
+	@DeleteMapping(path = "/delete/{userCode}")
+	public ResponseEntity<String> delStudent(@PathVariable("userCode") String userCode) {
+		String message = service.deleteStudent(userCode);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 

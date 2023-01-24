@@ -2,13 +2,12 @@ package com.exprivia.demo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.DocenteDto;
-import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.model.Docente;
-import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.DocenteRepo;
 
 @Service
@@ -28,12 +27,12 @@ public class DocenteService {
 
 			DocenteDto docenteDto = new DocenteDto();
 
-			docenteDto.setId(docente.getId());
 			docenteDto.setNome(docente.getNome());
 			docenteDto.setCognome(docente.getCognome());
 			docenteDto.setMail(docente.getMail());
-			docenteDto.setPas(" ");
+			docenteDto.setPas(null);
 			docenteDto.setMateria(docente.getMateria());
+			docenteDto.setCodiceFiscale(docente.getCodiceFiscale());
 
 			docentiDto.add(docenteDto);
 
@@ -47,11 +46,12 @@ public class DocenteService {
 
 		docente.setNome(docenteDto.getNome());
 		docente.setCognome(docenteDto.getCognome());
+		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
 		docente.setMail(docenteDto.getMail());
 		docente.setPas(docenteDto.getPas());
 		docente.setMateria(docenteDto.getMateria());
 
-		if (!repository.existsById(docenteDto.getId())) {
+		if (!repository.existsByCodiceFiscale(docenteDto.getCodiceFiscale())) {
 			repository.save(docente);
 			return "Docente salvato";
 		}
@@ -59,21 +59,20 @@ public class DocenteService {
 	}
 
 	public DocenteDto updateDocente(DocenteDto docenteDto) {
-
 		DocenteDto newDocenteDto = new DocenteDto();
-		Docente docente = repository.findDocenteById(docenteDto.getId())
+		Docente docente = repository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
 				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
 
-		docente.setId(docenteDto.getId());
 		docente.setNome(docenteDto.getNome());
 		docente.setCognome(docenteDto.getCognome());
 		docente.setMail(docenteDto.getMail());
 		docente.setPas(docenteDto.getPas());
 		docente.setMateria(docenteDto.getMateria());
+		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
 
 		repository.save(docente);
 		
-		docente = repository.findDocenteById(docenteDto.getId())
+		docente = repository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
 				.orElseThrow(() -> new RuntimeException("Utente non esistente")); 
 		
 		newDocenteDto.setNome(docente.getNome());
@@ -81,8 +80,19 @@ public class DocenteService {
 		newDocenteDto.setMail(docente.getMail());
 		newDocenteDto.setPas(null);
 		newDocenteDto.setMateria(docente.getMateria());
+		newDocenteDto.setCodiceFiscale(docenteDto.getCodiceFiscale());
 		
 		return newDocenteDto;
+
+	}
+	
+	public String deleteDocente(String codiceFiscale) {
+		Optional<Docente> docente = repository.findDocenteByCodiceFiscale(codiceFiscale);
+		if (docente.isPresent()) {
+			repository.deleteById(docente.get().getId());
+			return "utente eliminato";
+		}
+		return "Utente non presente";
 
 	}
 

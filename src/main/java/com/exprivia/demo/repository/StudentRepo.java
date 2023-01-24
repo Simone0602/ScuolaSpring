@@ -8,6 +8,6 @@ import com.exprivia.demo.model.Studente;
 
 public interface StudentRepo extends JpaRepository <Studente, Long>{
 
-	public Optional<Studente> findStudentById(long id);
+	public Optional<Studente> findStudentByUserCode(String userCode);
 
 }

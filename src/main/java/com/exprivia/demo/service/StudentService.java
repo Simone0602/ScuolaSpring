@@ -2,6 +2,7 @@ package com.exprivia.demo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -26,12 +27,11 @@ public class StudentService {
 
 			StudenteDto studenteDto = new StudenteDto();
 
-			studenteDto.setId(studente.getId());
 			studenteDto.setNome(studente.getNome());
 			studenteDto.setCognome(studente.getCognome());
-			studenteDto.setUserCode(studente.getUserCode());
+			studenteDto.setUserCode(null);
 			studenteDto.setMail(studente.getMail());
-			studenteDto.setPas(" ");
+			studenteDto.setPas(null);
 
 			studentiDto.add(studenteDto);
 
@@ -58,34 +58,34 @@ public class StudentService {
 
 	public StudenteDto updateStudent(StudenteDto studenteDto) {
 		StudenteDto newStudenteDto = new StudenteDto();
-		Studente studente = repository.findStudentById(studenteDto.getId())
+		Studente studente = repository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
 
-		studente.setId(studenteDto.getId());
+		studente.setId(studente.getId());
 		studente.setNome(studenteDto.getNome());
 		studente.setCognome(studenteDto.getCognome());
-		studente.setUserCode(studenteDto.getUserCode());
 		studente.setMail(studenteDto.getMail());
 		studente.setPas(studenteDto.getPas());
 
 		repository.save(studente);
 		
-		studente = repository.findStudentById(studenteDto.getId())
+		studente = repository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new RuntimeException("Utente non esistente")); 
 		
 		newStudenteDto.setNome(studente.getNome());
 		newStudenteDto.setCognome(studente.getCognome());
 		newStudenteDto.setUserCode(studente.getUserCode());
 		newStudenteDto.setMail(studente.getMail());
-		newStudenteDto.setPas(null);
+		newStudenteDto.setPas(studente.getPas());
 		
 		return newStudenteDto;
 
 	}
 
-	public String deleteStudent(long id) {
-		if (repository.findStudentById(id).isPresent()) {
-			repository.deleteById(id);
+	public String deleteStudent(String userCode) {
+		Optional<Studente> studente = repository.findStudentByUserCode(userCode);
+		if (studente.isPresent()) {
+			repository.deleteById(studente.get().getId());
 			return "utente eliminato";
 		}
 		return "Utente non presente";
