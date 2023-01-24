@@ -1,31 +1,15 @@
-package com.exprivia.demo.model;
+package com.exprivia.demo.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "classi")
-public class Classe {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
-	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
+public class ClasseDto {
 	private Long id;
-	@Column(name = "sezione")
 	private String sezione;
-	@Column(name = "cordinatore")
 	private String cordinatore;
-	@Column(name = "aula")
 	private String aula;
 
-	public Classe() {
+	public ClasseDto() {
 	}
 
-	public Classe(Long id, String sezione, String cordinatore, String aula) {
+	public ClasseDto(Long id, String sezione, String cordinatore, String aula) {
 		super();
 		this.id = id;
 		this.sezione = sezione;
@@ -70,5 +54,4 @@ public class Classe {
 		return "Classe [getId()=" + getId() + ", getSezione()=" + getSezione() + ", getCordinatore()="
 				+ getCordinatore() + ", getAula()=" + getAula() + "]";
 	}
-
 }
