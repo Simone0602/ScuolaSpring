@@ -41,14 +41,14 @@ public class StudentController {
 
 	@PutMapping(path = "/update")
 	public ResponseEntity<Studente> modStudent(@RequestBody StudenteDto studenteDto) {
-		Studente studente = service.modStudent(studenteDto);
+		Studente studente = service.updateStudent(studenteDto);
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
 
 	@DeleteMapping(path = "/delete/{id}")
-	public ResponseEntity<?> delStudent(@PathVariable("id") long id) {
-		service.delStudent(id);
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<String> delStudent(@PathVariable("id") long id) {
+		String message = service.deleteStudent(id);
+		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 }
