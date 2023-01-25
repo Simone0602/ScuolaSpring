@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exprivia.demo.dto.StudenteDto;
-import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.service.StudentService;
 
 @RestController
@@ -27,15 +26,23 @@ public class StudentController {
 		this.service = service;
 	}
 	
-	@GetMapping(path = "/findAll")
-	public ResponseEntity<List<StudenteDto>> getAllStudent() {
-		List<StudenteDto> studenti = service.findAllStudent();
+	//SERVE PER LA SEGRETERIA
+	@GetMapping(path = "/findStudent/{codeUser}")
+	public ResponseEntity<StudenteDto> getStudentByCodeUser(@PathVariable("codeUser") String codeUser) {
+		StudenteDto studenti = service.findStudentByCodeUser(codeUser);
+		return new ResponseEntity<>(studenti, HttpStatus.OK);
+	}
+	//SERVE PER L'UTENTE
+	@GetMapping(path = "/find/{sezione}")
+	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione(@PathVariable("sezione") String sezione) {
+		List<StudenteDto> studenti = service.findAllStudentBySezione(sezione);
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
 
+	//SERVE PER LA SEGRETERIA
 	@PostMapping(path = "/add/{sezione}")
-	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto, @PathVariable("sezione") String id) {
-		String message = service.addStudent(studenteDto, id);
+	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto, @PathVariable("sezione") String sezione) {
+		String message = service.addStudent(studenteDto, sezione);
 		return new ResponseEntity<>(message, HttpStatus.CREATED);
 	}
 

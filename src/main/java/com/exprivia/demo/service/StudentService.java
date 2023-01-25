@@ -7,8 +7,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.NotFoundSezioneException;
+import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.ClassRepository;
@@ -26,33 +27,50 @@ public class StudentService {
 		this.classRepository = classRepository;
 	}
 
-	public List<StudenteDto> findAllStudent() {
-		List<Studente> studenti = studentRepository.findAll();
+	//SERVE SOLO ALLA SEGRETERIA PER TROVARE UNO STUDENTE
+	public StudenteDto findStudentByCodeUser(String codeUser) {
+		StudenteDto studenteDto = new StudenteDto();
+		Studente studente = studentRepository.findStudentByUserCode(codeUser)
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
+
+		studenteDto.setNome(studente.getNome());
+		studenteDto.setCognome(studente.getCognome());
+		studenteDto.setUserCode(null);
+		studenteDto.setMail(studente.getMail());
+		studenteDto.setPas(null);
+		studenteDto.setSezione(studente.getClasse().getSezione());
+		
+		return studenteDto;
+	}
+	
+	//SERVE PER L'UTENTE
+	public List<StudenteDto> findAllStudentBySezione(String sezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
+		List<Studente> studenti = studentRepository.findAll();
 
 		for (Studente studente : studenti) {
-
 			StudenteDto studenteDto = new StudenteDto();
 
-			studenteDto.setNome(studente.getNome());
-			studenteDto.setCognome(studente.getCognome());
-			studenteDto.setUserCode(null);
-			studenteDto.setMail(studente.getMail());
-			studenteDto.setPas(null);
-			studenteDto.setSezione(studente.getClasse().getSezione());
+			if(studente.getClasse().getSezione().equalsIgnoreCase(sezione)) {
+				studenteDto.setNome(studente.getNome());
+				studenteDto.setCognome(studente.getCognome());
+				studenteDto.setUserCode(null);
+				studenteDto.setMail(studente.getMail());
+				studenteDto.setPas(null);
+				studenteDto.setSezione(studente.getClasse().getSezione());
 
-			studentiDto.add(studenteDto);
-
+				studentiDto.add(studenteDto);
+			}
 		}
-
 		return studentiDto;
 	}
 
-	//FUNGE SOLO PER LA SEGRETERIA
+	//SERVE SOLO PER LA SEGRETERIA
 	public String addStudent(StudenteDto studenteDto, String sezione) {
 		Studente studente = new Studente();
 		Classe classe = classRepository.findBySezione(sezione)
-				.orElseThrow();
+				.orElseThrow(() -> new NotFoundSezioneException("Sezione non trovata"));
+		
 		if(!studentRepository.existsByUserCode(studenteDto.getUserCode())) {
 			studente.setNome(studenteDto.getNome());
 			studente.setCognome(studenteDto.getCognome());
