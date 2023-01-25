@@ -26,13 +26,11 @@ public class StudentController {
 		this.service = service;
 	}
 	
-	//ciao
-	
 	//SERVE PER LA SEGRETERIA
 	@GetMapping(path = "/findStudent/{codeUser}")
 	public ResponseEntity<StudenteDto> getStudentByCodeUser(@PathVariable("codeUser") String codeUser) {
-		StudenteDto studenti = service.findStudentByCodeUser(codeUser);
-		return new ResponseEntity<>(studenti, HttpStatus.OK);
+		StudenteDto studente = service.findStudentByCodeUser(codeUser);
+		return new ResponseEntity<>(studente, HttpStatus.OK);
 	}
 	//SERVE PER L'UTENTE
 	@GetMapping(path = "/find/{sezione}")
@@ -46,6 +44,12 @@ public class StudentController {
 	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto, @PathVariable("sezione") String sezione) {
 		String message = service.addStudent(studenteDto, sezione);
 		return new ResponseEntity<>(message, HttpStatus.CREATED);
+	}
+	//SERVE ALL'UTENTE PER LOGGARSI
+	@PostMapping(path = "/loginStudente")
+	public ResponseEntity<StudenteDto> loginStudent(@RequestBody StudenteDto studenteDto){
+		StudenteDto studente = service.findStudent(studenteDto);
+		return new ResponseEntity<>(studente, HttpStatus.FOUND);
 	}
 
 	@PutMapping(path = "/update")

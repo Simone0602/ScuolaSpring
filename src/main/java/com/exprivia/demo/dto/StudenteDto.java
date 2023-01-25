@@ -13,6 +13,16 @@ public class StudenteDto {
 	public StudenteDto() {
 	}
 
+	public StudenteDto(String nome, String cognome, String mail, String pas, String userCode, String sezione) {
+		super();
+		this.nome = nome;
+		this.cognome = cognome;
+		this.mail = mail;
+		this.pas = pas;
+		this.userCode = userCode;
+		this.sezione = sezione;
+	}
+
 	public String getSezione() {
 		return sezione;
 	}

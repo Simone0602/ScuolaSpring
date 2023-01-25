@@ -27,7 +27,7 @@ public class StudentService {
 		this.classRepository = classRepository;
 	}
 
-	//SERVE SOLO ALLA SEGRETERIA PER TROVARE UNO STUDENTE
+	// SERVE SOLO ALLA SEGRETERIA PER TROVARE UNO STUDENTE
 	public StudenteDto findStudentByCodeUser(String codeUser) {
 		StudenteDto studenteDto = new StudenteDto();
 		Studente studente = studentRepository.findStudentByUserCode(codeUser)
@@ -39,11 +39,11 @@ public class StudentService {
 		studenteDto.setMail(studente.getMail());
 		studenteDto.setPas(null);
 		studenteDto.setSezione(studente.getClasse().getSezione());
-		
+
 		return studenteDto;
 	}
-	
-	//SERVE PER L'UTENTE
+
+	// SERVE PER L'UTENTE
 	public List<StudenteDto> findAllStudentBySezione(String sezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
 		List<Studente> studenti = studentRepository.findAll();
@@ -51,7 +51,7 @@ public class StudentService {
 		for (Studente studente : studenti) {
 			StudenteDto studenteDto = new StudenteDto();
 
-			if(studente.getClasse().getSezione().equalsIgnoreCase(sezione)) {
+			if (studente.getClasse().getSezione().equalsIgnoreCase(sezione)) {
 				studenteDto.setNome(studente.getNome());
 				studenteDto.setCognome(studente.getCognome());
 				studenteDto.setUserCode(null);
@@ -65,20 +65,20 @@ public class StudentService {
 		return studentiDto;
 	}
 
-	//SERVE SOLO PER LA SEGRETERIA
+	// SERVE SOLO PER LA SEGRETERIA
 	public String addStudent(StudenteDto studenteDto, String sezione) {
 		Studente studente = new Studente();
 		Classe classe = classRepository.findBySezione(sezione)
 				.orElseThrow(() -> new NotFoundSezioneException("Sezione non trovata"));
-		
-		if(!studentRepository.existsByUserCode(studenteDto.getUserCode())) {
+
+		if (!studentRepository.existsByUserCode(studenteDto.getUserCode())) {
 			studente.setNome(studenteDto.getNome());
 			studente.setCognome(studenteDto.getCognome());
 			studente.setUserCode(studenteDto.getUserCode());
 			studente.setMail(studenteDto.getMail());
 			studente.setPas(studenteDto.getPas());
 			studente.setClasse(classe);
-			
+
 			studentRepository.save(studente);
 			return "Studente salvato";
 		}
@@ -87,28 +87,15 @@ public class StudentService {
 
 	public StudenteDto updateStudent(StudenteDto studenteDto) {
 		StudenteDto newStudenteDto = new StudenteDto();
-		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
-				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
+		Studente studente = setStudente_studenteDto(studenteDto);
 
-		studente.setId(studente.getId());
-		studente.setNome(studenteDto.getNome());
-		studente.setCognome(studenteDto.getCognome());
-		studente.setMail(studenteDto.getMail());
-		studente.setPas(studenteDto.getPas());
-
-		studentRepository.save(studente);
-		
-		studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
-				.orElseThrow(() -> new RuntimeException("Utente non esistente")); 
-		
 		newStudenteDto.setNome(studente.getNome());
 		newStudenteDto.setCognome(studente.getCognome());
 		newStudenteDto.setUserCode(studente.getUserCode());
 		newStudenteDto.setMail(studente.getMail());
 		newStudenteDto.setPas(studente.getPas());
-		
-		return newStudenteDto;
 
+		return newStudenteDto;
 	}
 
 	public String deleteStudent(String userCode) {
@@ -119,5 +106,40 @@ public class StudentService {
 		}
 		return "Utente non presente";
 
+	}
+
+	//LOGIN PER LO STUDENTE
+	public StudenteDto findStudent(StudenteDto studenteDto) {
+		StudenteDto studenteDtoLoggato = new StudenteDto();
+		Studente studente = studentRepository.findStudent(studenteDto.getMail(), studenteDto.getPas(), studenteDto.getUserCode());
+		
+		if(studente != null) {
+			studenteDtoLoggato.setNome(studente.getNome());
+			studenteDtoLoggato.setCognome(studente.getCognome());
+			studenteDtoLoggato.setUserCode(studente.getUserCode());
+			studenteDtoLoggato.setMail(studente.getMail());
+			studenteDtoLoggato.setPas(studente.getPas());
+			studenteDtoLoggato.setSezione(studente.getClasse().getSezione());
+			
+			return studenteDtoLoggato;
+		}
+		return studenteDtoLoggato;
+	}
+
+	//METODO USATO NELL'UPDATE
+	private Studente setStudente_studenteDto(StudenteDto studenteDto) {
+		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
+				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
+
+		studente.setId(studente.getId());
+		studente.setNome(studenteDto.getNome());
+		studente.setCognome(studenteDto.getCognome());
+		studente.setMail(studenteDto.getMail());
+		studente.setPas(studenteDto.getPas());
+
+		studentRepository.save(studente);
+
+		return studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
+				.orElseThrow(() -> new RuntimeException("Utente non esistente"));
 	}
 }
