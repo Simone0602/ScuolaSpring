@@ -1,6 +1,5 @@
 package com.exprivia.demo.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +15,5 @@ public interface StudentRepo extends JpaRepository <Studente, Long>{
 	public boolean existsByUserCode(String userCode);
 
 	public boolean existsByMail(String mail);
+	
 }
