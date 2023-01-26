@@ -2,6 +2,7 @@ package com.exprivia.demo.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -35,6 +36,7 @@ public class Classe {
 	private List<Studente> studenti;
 	
 	@ManyToMany(mappedBy = "classi", fetch = FetchType.LAZY)
+	@JsonBackReference
 	private List<Docente> docenti;
 
 	public Classe() {

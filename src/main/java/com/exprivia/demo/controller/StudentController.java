@@ -27,12 +27,18 @@ public class StudentController {
 	}
 	
 	//SERVE PER LA SEGRETERIA
-	@GetMapping(path = "/findStudent/{codeUser}")
-	public ResponseEntity<StudenteDto> getStudentByCodeUser(@PathVariable("codeUser") String codeUser) {
-		StudenteDto studente = service.findStudentByCodeUser(codeUser);
+	@GetMapping(path = "/findStudent/{mail}")
+	public ResponseEntity<StudenteDto> getStudentByCodeUser(@PathVariable("mail") String mail) {
+		StudenteDto studente = service.findStudentByMail(mail);
 		return new ResponseEntity<>(studente, HttpStatus.OK);
 	}
-	//SERVE PER L'UTENTE
+	//SERVE ALLA SEGRETERIA PER TROVARE TUTTI QUELLI DELL'ULTIMO ANNO
+	@GetMapping(path = "/findAllStudent")
+	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione5(){
+		List<StudenteDto> studenti = service.findAllStudentBySezione5("5");
+		return new ResponseEntity<>(studenti, HttpStatus.OK);
+	}
+	//SERVE PER ALLO STUDENTE
 	@GetMapping(path = "/find/{sezione}")
 	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione(@PathVariable("sezione") String sezione) {
 		List<StudenteDto> studenti = service.findAllStudentBySezione(sezione);
@@ -40,27 +46,28 @@ public class StudentController {
 	}
 
 	//SERVE PER LA SEGRETERIA
-	@PostMapping(path = "/add/{sezione}")
-	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto, @PathVariable("sezione") String sezione) {
-		String message = service.addStudent(studenteDto, sezione);
+	@PostMapping(path = "/add")
+	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto) {
+		String message = service.addStudent(studenteDto);
 		return new ResponseEntity<>(message, HttpStatus.CREATED);
 	}
-	//SERVE ALL'UTENTE PER LOGGARSI
+	//SERVE ALLO STUDENTE PER LOGGARSI (INSERIMENTO DI USERCODE E PASS)
 	@PostMapping(path = "/loginStudente")
-	public ResponseEntity<StudenteDto> loginStudent(@RequestBody StudenteDto studenteDto){
-		StudenteDto studente = service.findStudent(studenteDto);
+	public ResponseEntity<StudenteDto> loginStudent(@RequestBody String userCode){
+		StudenteDto studente = service.findStudent(userCode);
 		return new ResponseEntity<>(studente, HttpStatus.FOUND);
 	}
-
+	
+	//SERVE ALLA SEGRETERIA PER CAMBIARE I PARAMETRI DELLO STUDENTE
 	@PutMapping(path = "/update")
-	public ResponseEntity<StudenteDto> modStudent(@RequestBody StudenteDto studenteDto) {
+	public ResponseEntity<StudenteDto> updateStudent(@RequestBody StudenteDto studenteDto) {
 		StudenteDto studente = service.updateStudent(studenteDto);
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
-
-	@DeleteMapping(path = "/delete/{userCode}")
-	public ResponseEntity<String> delStudent(@PathVariable("userCode") String userCode) {
-		String message = service.deleteStudent(userCode);
+	//SERVE ALLA SEGRETERIA PER ELIMINARE GLI STUDENTI CHE HANNO COMPLETATO GLI STUDI
+	@DeleteMapping(path = "/delete/{mail}")
+	public ResponseEntity<String> deleteStudent(@PathVariable("mail") String mail) {
+		String message = service.deleteStudent(mail);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 

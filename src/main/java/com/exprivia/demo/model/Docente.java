@@ -2,6 +2,8 @@ package com.exprivia.demo.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,6 +49,7 @@ public class Docente {
 						@JoinColumn(name = "classe_id", referencedColumnName = "classe_id")
 				}
 			)
+	@JsonManagedReference
 	private List<Classe> classi;
 
 	public Docente() {
