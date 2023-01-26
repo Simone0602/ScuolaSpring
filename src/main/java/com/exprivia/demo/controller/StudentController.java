@@ -28,7 +28,7 @@ public class StudentController {
 	
 	//SERVE ALLA SEGRETERIA
 	@GetMapping(path = "/findStudent/{mail}")
-	public ResponseEntity<StudenteDto> getStudentByCodeUser(@PathVariable("mail") String mail) {
+	public ResponseEntity<StudenteDto> getStudentByMail(@PathVariable("mail") String mail) {
 		StudenteDto studente = service.findStudentByMail(mail);
 		return new ResponseEntity<>(studente, HttpStatus.OK);
 	}
@@ -44,7 +44,6 @@ public class StudentController {
 		List<StudenteDto> studenti = service.findAllStudentBySezione(sezione);
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
-
 
 	//SERVE ALLA SEGRETERIA
 	@PostMapping(path = "/add")
@@ -66,10 +65,9 @@ public class StudentController {
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
 	//SERVE ALLA SEGRETERIA PER ELIMINARE GLI STUDENTI CHE HANNO COMPLETATO GLI STUDI
-	@DeleteMapping(path = "/delete/{mail}")
-	public ResponseEntity<String> deleteStudent(@PathVariable("mail") String mail) {
-		String message = service.deleteStudent(mail);
+	@DeleteMapping(path = "/delete/{userCode}")
+	public ResponseEntity<String> deleteStudent(@PathVariable("useCode") String userCode) {
+		String message = service.deleteStudent(userCode);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
-
 }

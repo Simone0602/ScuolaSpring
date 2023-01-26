@@ -20,7 +20,6 @@ public class StudentService {
 
 	private final StudentRepo studentRepository;
 	private final ClassRepository classRepository;
-	
 
 	@Autowired
 	public StudentService(StudentRepo studentRepository, ClassRepository classRepository) {
@@ -36,7 +35,7 @@ public class StudentService {
 
 		studenteDto.setNome(studente.getNome());
 		studenteDto.setCognome(studente.getCognome());
-		studenteDto.setUserCode(null);
+		studenteDto.setUserCode(studente.getUserCode());
 		studenteDto.setMail(studente.getMail());
 		studenteDto.setPas(null);
 		studenteDto.setSezione(studente.getClasse().getSezione());
@@ -171,6 +170,5 @@ public class StudentService {
 			return "utente eliminato";
 		}
 		return "Utente non presente";
-
 	}
 }

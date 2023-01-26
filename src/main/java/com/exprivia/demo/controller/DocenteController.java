@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.service.DocenteService;
 
@@ -26,24 +27,33 @@ public class DocenteController {
 		this.service = service;
 	}
 	
+	//SERVE ALLO STUDENTE DI VEDERE TUTTI GLI INSEGNANTI
 	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<DocenteDto>> getAllDocenti() {
 		List<DocenteDto> docenti = service.findAllDocenti();
 		return new ResponseEntity<>(docenti, HttpStatus.OK);
 	}
+	//SERVE ALLO STUDENTE PER VEDERE UN DETERMINATO INSEGNANTE
+	@GetMapping(path = "/find/{codiceFiscale}")
+	public ResponseEntity<List<ClasseDto>> getAllClassByDocente(@PathVariable("codiceFiscale") String codiceFiscale){
+		List<ClasseDto> classi = service.findAllClassByDocente(codiceFiscale);
+		return new ResponseEntity<>(classi, HttpStatus.OK);
+	}
 	
+	//SERVE ALLA SEGRETERIA
 	@PostMapping(path = "/add")
 	public ResponseEntity<String> addDocente(@RequestBody DocenteDto docenteDto) {
 		String messaggio = service.addDocente(docenteDto);
 		return new ResponseEntity<>(messaggio, HttpStatus.CREATED);
 	}
 
+	//SERVE ALLA SEGRETERIA
 	@PutMapping(path = "/update")
 	public ResponseEntity<DocenteDto> updateDocente(@RequestBody DocenteDto docenteDto) {
 		DocenteDto docente = service.updateDocente(docenteDto);
 		return new ResponseEntity<>(docente, HttpStatus.CREATED);
 	}
-
+	//SERVE ALLA SEGRETERIA
 	@DeleteMapping(path = "/delete/{codiceFiscale}") 
 	public ResponseEntity<String> deleteDocente(@PathVariable("codiceFiscale") String codiceFiscale) { 
 		String messaggio = service.deleteDocente(codiceFiscale); 

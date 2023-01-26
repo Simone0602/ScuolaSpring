@@ -66,6 +66,15 @@ public class Docente {
 		this.codiceFiscale = codiceFiscale;
 		this.materia = materia;
 	}
+	
+
+	public List<Classe> getClassi() {
+		return classi;
+	}
+
+	public void setClassi(List<Classe> classi) {
+		this.classi = classi;
+	}
 
 	public long getId() {
 		return id;
