@@ -26,7 +26,7 @@ public class StudentController {
 		this.service = service;
 	}
 	
-	//SERVE PER LA SEGRETERIA
+	//SERVE ALLA SEGRETERIA
 	@GetMapping(path = "/findStudent/{mail}")
 	public ResponseEntity<StudenteDto> getStudentByCodeUser(@PathVariable("mail") String mail) {
 		StudenteDto studente = service.findStudentByMail(mail);
@@ -38,14 +38,14 @@ public class StudentController {
 		List<StudenteDto> studenti = service.findAllStudentBySezione5("5");
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
-	//SERVE PER ALLO STUDENTE
+	//SERVE ALLO STUDENTE
 	@GetMapping(path = "/find/{sezione}")
 	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione(@PathVariable("sezione") String sezione) {
 		List<StudenteDto> studenti = service.findAllStudentBySezione(sezione);
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
 
-	//SERVE PER LA SEGRETERIA
+	//SERVE ALLA SEGRETERIA
 	@PostMapping(path = "/add")
 	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto) {
 		String message = service.addStudent(studenteDto);
