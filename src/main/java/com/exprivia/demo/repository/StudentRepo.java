@@ -14,6 +14,11 @@ public interface StudentRepo extends JpaRepository <Studente, Long>{
 
 	public boolean existsByUserCode(String userCode);
 
+<<<<<<< HEAD
 	@Query(value = "SELECT * FROM studenti WHERE email = :mail and password = :pas and user_code = :user_code", nativeQuery = true)
 	public Studente findStudent(@Param("mail") String mail, @Param("pas") String pas, @Param("user_code") String userCode);
+=======
+	public boolean existsByMail(String mail);
+	
+>>>>>>> 988e8a136ce21c3c573e27ec21f3bd7804707100
 }
