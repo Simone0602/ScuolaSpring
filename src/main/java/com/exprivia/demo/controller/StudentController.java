@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,10 +53,11 @@ public class StudentController {
 		return new ResponseEntity<>(message, HttpStatus.CREATED);
 	}
 	//SERVE ALLO STUDENTE PER LOGGARSI (INSERIMENTO DI USERCODE E PASS)
+	@CrossOrigin
 	@PostMapping(path = "/loginStudente")
 	public ResponseEntity<StudenteDto> loginStudent(@RequestBody String userCode){
 		StudenteDto studente = service.findStudent(userCode);
-		return new ResponseEntity<>(studente, HttpStatus.FOUND);
+		return new ResponseEntity<>(studente, HttpStatus.OK);
 	}
 	
 	//SERVE ALLA SEGRETERIA PER CAMBIARE I PARAMETRI DELLO STUDENTE
