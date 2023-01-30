@@ -49,6 +49,23 @@ public class Classe {
 		this.aula = aula;
 	}
 
+	
+	public List<Studente> getStudenti() {
+		return studenti;
+	}
+
+	public void setStudenti(List<Studente> studenti) {
+		this.studenti = studenti;
+	}
+
+	public List<Docente> getDocenti() {
+		return docenti;
+	}
+
+	public void setDocenti(List<Docente> docenti) {
+		this.docenti = docenti;
+	}
+
 	public Long getId() {
 		return id;
 	}
