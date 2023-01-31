@@ -1,5 +1,6 @@
 package com.exprivia.demo.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.DontSendEmailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.service.StudentService;
@@ -85,5 +87,19 @@ public class StudentController {
 	public ResponseEntity<String> deleteStudent(@PathVariable("useCode") String userCode) {
 		String message = service.deleteStudent(userCode);
 		return new ResponseEntity<>(message, HttpStatus.OK);
+	}
+	
+	//SERVE PER INVIARE L'EMAIL
+	@CrossOrigin
+	@PostMapping(path = "/sendEmail")
+	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto) throws UnsupportedEncodingException{
+		try {
+			String message = service.resetPassword(studenteDto);
+			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
+		}catch(NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}catch(DontSendEmailException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		}
 	}
 }

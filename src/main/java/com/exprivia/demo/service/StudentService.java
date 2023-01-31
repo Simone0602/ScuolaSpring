@@ -1,5 +1,6 @@
 package com.exprivia.demo.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
+import com.exprivia.demo.mail.SendMailStudenteService;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.ClassRepository;
@@ -20,11 +22,13 @@ public class StudentService {
 
 	private final StudentRepo studentRepository;
 	private final ClassRepository classRepository;
+	private final SendMailStudenteService studenteMailService;
 
 	@Autowired
-	public StudentService(StudentRepo studentRepository, ClassRepository classRepository) {
+	public StudentService(StudentRepo studentRepository, ClassRepository classRepository, SendMailStudenteService studenteMailService) {
 		this.studentRepository = studentRepository;
 		this.classRepository = classRepository;
+		this.studenteMailService = studenteMailService;
 	}
 
 	// SERVE SOLO ALLA SEGRETERIA PER TROVARE UNO STUDENTE
@@ -145,7 +149,7 @@ public class StudentService {
 	//METODO USATO NELL'UPDATE
 	private Studente setStudente_studenteDto(StudenteDto studenteDto) {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));;
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		Classe classe = classRepository.findBySezione(studenteDto.getSezione())
 				.orElseThrow(() -> new NotFoundSezioneException("Sezione non trovata"));
 
@@ -162,11 +166,18 @@ public class StudentService {
 
 	public String deleteStudent(String userCode) {
 		Studente studente = studentRepository.findStudentByUserCode(userCode)
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));;
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		if (studente != null) {
 			studentRepository.deleteById(studente.getId());
 			return "utente eliminato";
 		}
 		return "Utente non presente";
+	}
+	
+	//METODO RESET PASSWORD
+	public String resetPassword(StudenteDto studenteDto) throws UnsupportedEncodingException {
+		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
+		return studenteMailService.sendEmail(studente);
 	}
 }
