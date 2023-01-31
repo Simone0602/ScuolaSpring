@@ -2,12 +2,12 @@ package com.exprivia.demo.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.model.Classe;
@@ -68,21 +68,19 @@ public class StudentService {
 	// SERVE PER L'UTENTE
 	public List<StudenteDto> findAllStudentBySezione(String sezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
-		List<Studente> studenti = studentRepository.findAll();
+		List<Studente> studenti = classRepository.findBySezione(sezione).get().getStudenti();
 
 		for (Studente studente : studenti) {
 			StudenteDto studenteDto = new StudenteDto();
 
-			if (studente.getClasse().getSezione().equalsIgnoreCase(sezione)) {
-				studenteDto.setNome(studente.getNome());
-				studenteDto.setCognome(studente.getCognome());
-				studenteDto.setUserCode(null);
-				studenteDto.setMail(studente.getMail());
-				studenteDto.setPas(null);
-				studenteDto.setSezione(studente.getClasse().getSezione());
+			studenteDto.setNome(studente.getNome());
+			studenteDto.setCognome(studente.getCognome());
+			studenteDto.setUserCode(null);
+			studenteDto.setMail(studente.getMail());
+			studenteDto.setPas(null);
+			studenteDto.setSezione(studente.getClasse().getSezione());
 
-				studentiDto.add(studenteDto);
-			}
+			studentiDto.add(studenteDto);
 		}
 		return studentiDto;
 	}
@@ -111,21 +109,22 @@ public class StudentService {
 	}
 	
 	//LOGIN PER LO STUDENTE
-	public StudenteDto findStudent(String userCode) {
+	public StudenteDto findStudent(StudenteDto studenteDto) {
 		StudenteDto studenteDtoLoggato = new StudenteDto();
-		Studente studente = studentRepository.findStudentByUserCode(userCode)
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));;
+		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		
-		if(studente != null) {
-			studenteDtoLoggato.setNome(studente.getNome());
-			studenteDtoLoggato.setCognome(studente.getCognome());
-			studenteDtoLoggato.setUserCode(null);
-			studenteDtoLoggato.setMail(studente.getMail());
-			studenteDtoLoggato.setPas(null);
-			studenteDtoLoggato.setSezione(studente.getClasse().getSezione());
-			
-			return studenteDtoLoggato;
+		if(!studente.getPas().equals(studenteDto.getPas())) {
+			throw new IllegalPasswordException("Password errata");
 		}
+		
+		studenteDtoLoggato.setNome(studente.getNome());
+		studenteDtoLoggato.setCognome(studente.getCognome());
+		studenteDtoLoggato.setUserCode(null);
+		studenteDtoLoggato.setMail(studente.getMail());
+		studenteDtoLoggato.setPas(studente.getPas());
+		studenteDtoLoggato.setSezione(studente.getClasse().getSezione());
+
 		return studenteDtoLoggato;
 	}
 
@@ -146,11 +145,10 @@ public class StudentService {
 	//METODO USATO NELL'UPDATE
 	private Studente setStudente_studenteDto(StudenteDto studenteDto) {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
-				.orElseThrow(() -> new NotFoundStudentException("Utente non esistente"));
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));;
 		Classe classe = classRepository.findBySezione(studenteDto.getSezione())
 				.orElseThrow(() -> new NotFoundSezioneException("Sezione non trovata"));
 
-		studente.setId(studente.getId());
 		studente.setNome(studenteDto.getNome());
 		studente.setCognome(studenteDto.getCognome());
 		studente.setMail(studenteDto.getMail());
@@ -159,14 +157,14 @@ public class StudentService {
 
 		studentRepository.save(studente);
 
-		return studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
-				.orElseThrow(() -> new NotFoundStudentException("Utente non esistente"));
+		return studente;
 	}
 
 	public String deleteStudent(String userCode) {
-		Optional<Studente> studente = studentRepository.findStudentByUserCode(userCode);
-		if (studente.isPresent()) {
-			studentRepository.deleteById(studente.get().getId());
+		Studente studente = studentRepository.findStudentByUserCode(userCode)
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));;
+		if (studente != null) {
+			studentRepository.deleteById(studente.getId());
 			return "utente eliminato";
 		}
 		return "Utente non presente";
