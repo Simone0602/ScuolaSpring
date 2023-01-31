@@ -3,31 +3,40 @@ package com.exprivia.demo.service;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.mail.SendMailStudenteService;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
+import com.exprivia.demo.model.Token;
 import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.StudentRepo;
+import com.exprivia.demo.repository.TokenRepository;
 
 @Service
 public class StudentService {
 
 	private final StudentRepo studentRepository;
 	private final ClassRepository classRepository;
+	private final TokenRepository tokenRepository;
 	private final SendMailStudenteService studenteMailService;
 
 	@Autowired
-	public StudentService(StudentRepo studentRepository, ClassRepository classRepository, SendMailStudenteService studenteMailService) {
+	public StudentService(StudentRepo studentRepository, 
+			ClassRepository classRepository, 
+			TokenRepository tokenRepository, 
+			SendMailStudenteService studenteMailService) {
 		this.studentRepository = studentRepository;
 		this.classRepository = classRepository;
+		this.tokenRepository = tokenRepository;
 		this.studenteMailService = studenteMailService;
 	}
 
@@ -175,9 +184,20 @@ public class StudentService {
 	}
 	
 	//METODO RESET PASSWORD
-	public String resetPassword(StudenteDto studenteDto) throws UnsupportedEncodingException {
+	public String resetPassword(StudenteDto studenteDto, String tipoUser) throws UnsupportedEncodingException {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		return studenteMailService.sendEmail(studente);
+		
+		if(!studente.getMail().equals(studenteDto.getMail())) {
+			throw new IllegalMailException("Email errata");
+		}
+		
+		UUID uuid = UUID.randomUUID();
+		String resetToken = uuid.toString();
+		
+		Token token = new Token(resetToken, studente);
+		tokenRepository.save(token);
+		
+		return studenteMailService.sendEmail(studente.getMail(), resetToken, tipoUser);
 	}
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.exception.DontSendEmailException;
+import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.service.StudentService;
@@ -91,13 +92,15 @@ public class StudentController {
 	
 	//SERVE PER INVIARE L'EMAIL
 	@CrossOrigin
-	@PostMapping(path = "/sendEmail")
-	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto) throws UnsupportedEncodingException{
+	@PostMapping(path = "/sendEmail/{tipoUser}")
+	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto, @PathVariable("tipoUser") String tipoUser) throws UnsupportedEncodingException{
 		try {
-			String message = service.resetPassword(studenteDto);
+			String message = service.resetPassword(studenteDto, tipoUser);
 			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
 		}catch(NotFoundStudentException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}catch(IllegalMailException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 		}catch(DontSendEmailException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}

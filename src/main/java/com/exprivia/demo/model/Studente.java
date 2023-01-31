@@ -1,6 +1,9 @@
 package com.exprivia.demo.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
@@ -37,6 +41,10 @@ public class Studente {
 	@JoinColumn(name = "classe_id")
 	@JsonBackReference
 	private Classe classe;
+	
+	@OneToMany(mappedBy = "studente")
+	@JsonManagedReference
+	private List<Token> tokens;
 
 	public Studente() {
 	}
@@ -48,6 +56,15 @@ public class Studente {
 		this.pas = pas;
 		this.userCode = userCode;
 		this.classe = classe;
+	}
+
+	
+	public List<Token> getTokens() {
+		return tokens;
+	}
+
+	public void setTokens(List<Token> tokens) {
+		this.tokens = tokens;
 	}
 
 	public Classe getClasse() {
