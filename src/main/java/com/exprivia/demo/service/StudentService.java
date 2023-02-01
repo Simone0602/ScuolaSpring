@@ -1,6 +1,7 @@
 package com.exprivia.demo.service;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
+import com.exprivia.demo.exception.NotFoundTokenException;
 import com.exprivia.demo.mail.SendMailStudenteService;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
@@ -199,5 +201,35 @@ public class StudentService {
 		tokenRepository.save(token);
 		
 		return studenteMailService.sendEmail(studente.getMail(), resetToken, tipoUser);
+	}
+
+	//SERVE PER L'UPDATE DELLA PASSWORD
+	public String updatePassword(String password, String token) {
+		Token newToken = tokenRepository.findByIdAndDate(token, LocalDate.now())
+				.orElseThrow(() -> new NotFoundTokenException("Token non trovato o scaduto"));
+		Studente studente = studentRepository.findById(newToken.getStudente().getId())
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
+		
+		studente.setPas(password);
+		
+		studentRepository.save(studente);
+		tokenRepository.delete(newToken);
+		return "Password aggiornata";
+	}
+	//SERVE PER OTTENERE IL TOKEN
+	public String getToken(String userCode) {
+		LocalDate date_now = LocalDate.now();
+		Studente studente = studentRepository.findStudentByUserCode(userCode)
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
+		
+		for(Token token : studente.getTokens()) {
+			if(token.getExpiredDate().isAfter(date_now)) {
+				return token.getToken();
+			}
+			if(token.getExpiredDate().equals(date_now)) {
+				return token.getToken();
+			}
+		}
+		throw new NotFoundTokenException("Token scaduto");
 	}
 }
