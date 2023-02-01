@@ -20,6 +20,7 @@ import com.exprivia.demo.exception.DontSendEmailException;
 import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundStudentException;
+import com.exprivia.demo.exception.NotFoundTokenException;
 import com.exprivia.demo.service.StudentService;
 
 @RestController
@@ -74,22 +75,6 @@ public class StudentController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 		}
 	}
-	
-	//SERVE ALLA SEGRETERIA PER CAMBIARE I PARAMETRI DELLO STUDENTE
-	@CrossOrigin
-	@PutMapping(path = "/update")
-	public ResponseEntity<StudenteDto> updateStudent(@RequestBody StudenteDto studenteDto) {
-		StudenteDto studente = service.updateStudent(studenteDto);
-		return new ResponseEntity<>(studente, HttpStatus.CREATED);
-	}
-	//SERVE ALLA SEGRETERIA PER ELIMINARE GLI STUDENTI CHE HANNO COMPLETATO GLI STUDI
-	@CrossOrigin
-	@DeleteMapping(path = "/delete/{userCode}")
-	public ResponseEntity<String> deleteStudent(@PathVariable("useCode") String userCode) {
-		String message = service.deleteStudent(userCode);
-		return new ResponseEntity<>(message, HttpStatus.OK);
-	}
-	
 	//SERVE PER INVIARE L'EMAIL
 	@CrossOrigin
 	@PostMapping(path = "/sendEmail/{tipoUser}")
@@ -104,5 +89,47 @@ public class StudentController {
 		}catch(DontSendEmailException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
+	}
+	//SERVE PER POTER OTTENERE IL TOKEN
+	@CrossOrigin
+	@PostMapping(path = "/getToken")
+	public ResponseEntity<String> getToken(@RequestBody String userCode){
+		try {
+			String newToken = service.getToken(userCode);
+			return new ResponseEntity<>(newToken, HttpStatus.OK);
+		}catch(NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}catch(NotFoundTokenException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+		}
+	}
+	
+	//SERVE ALLA SEGRETERIA PER CAMBIARE I PARAMETRI DELLO STUDENTE
+	@CrossOrigin
+	@PutMapping(path = "/update")
+	public ResponseEntity<StudenteDto> updateStudent(@RequestBody StudenteDto studenteDto) {
+		StudenteDto studente = service.updateStudent(studenteDto);
+		return new ResponseEntity<>(studente, HttpStatus.CREATED);
+	}
+	//SERVE PER FARE L'UPDATE DELLA PASSWORD
+	@CrossOrigin
+	@PutMapping(path = "/updatePassword/{token}")
+	public ResponseEntity<String> updatePassword(@RequestBody String password, @PathVariable("token") String token){
+		try {
+			String message = service.updatePassword(password, token);
+			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
+		}catch(NotFoundTokenException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}catch(NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	//SERVE ALLA SEGRETERIA PER ELIMINARE GLI STUDENTI CHE HANNO COMPLETATO GLI STUDI
+	@CrossOrigin
+	@DeleteMapping(path = "/delete/{userCode}")
+	public ResponseEntity<String> deleteStudent(@PathVariable("useCode") String userCode) {
+		String message = service.deleteStudent(userCode);
+		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 }
