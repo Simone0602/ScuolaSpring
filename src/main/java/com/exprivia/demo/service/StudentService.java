@@ -52,7 +52,7 @@ public class StudentService {
 		studenteDto.setCognome(studente.getCognome());
 		studenteDto.setUserCode(studente.getUserCode());
 		studenteDto.setMail(studente.getMail());
-		studenteDto.setPas(null);
+		studenteDto.setPassword(null);
 		studenteDto.setSezione(studente.getClasse().getSezione());
 
 		return studenteDto;
@@ -71,7 +71,7 @@ public class StudentService {
 				studenteDto.setCognome(studente.getCognome());
 				studenteDto.setUserCode(studente.getUserCode());
 				studenteDto.setMail(studente.getMail());
-				studenteDto.setPas(studente.getPas());
+				studenteDto.setPassword(studente.getPassword());
 				studenteDto.setSezione(studente.getClasse().getSezione());
 
 				studentiDto.add(studenteDto);
@@ -92,7 +92,7 @@ public class StudentService {
 			studenteDto.setCognome(studente.getCognome());
 			studenteDto.setUserCode(null);
 			studenteDto.setMail(studente.getMail());
-			studenteDto.setPas(null);
+			studenteDto.setPassword(null);
 			studenteDto.setSezione(studente.getClasse().getSezione());
 
 			studentiDto.add(studenteDto);
@@ -112,7 +112,7 @@ public class StudentService {
 				studente.setCognome(studenteDto.getCognome());
 				studente.setUserCode(studenteDto.getUserCode());
 				studente.setMail(studenteDto.getMail());
-				studente.setPas(studenteDto.getPas());
+				studente.setPassword(studenteDto.getPassword());
 				studente.setClasse(classe);
 
 				studentRepository.save(studente);
@@ -129,7 +129,7 @@ public class StudentService {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		
-		if(!studente.getPas().equals(studenteDto.getPas())) {
+		if(!studente.getPassword().equals(studenteDto.getPassword())) {
 			throw new IllegalPasswordException("Password errata");
 		}
 		
@@ -137,7 +137,7 @@ public class StudentService {
 		studenteDtoLoggato.setCognome(studente.getCognome());
 		studenteDtoLoggato.setUserCode(null);
 		studenteDtoLoggato.setMail(studente.getMail());
-		studenteDtoLoggato.setPas(studente.getPas());
+		studenteDtoLoggato.setPassword(studente.getPassword());
 		studenteDtoLoggato.setSezione(studente.getClasse().getSezione());
 
 		return studenteDtoLoggato;
@@ -152,7 +152,7 @@ public class StudentService {
 		newStudenteDto.setCognome(studente.getCognome());
 		newStudenteDto.setUserCode(studente.getUserCode());
 		newStudenteDto.setMail(studente.getMail());
-		newStudenteDto.setPas(studente.getPas());
+		newStudenteDto.setPassword(studente.getPassword());
 		newStudenteDto.setSezione(studente.getClasse().getSezione());
 
 		return newStudenteDto;
@@ -167,7 +167,7 @@ public class StudentService {
 		studente.setNome(studenteDto.getNome());
 		studente.setCognome(studenteDto.getCognome());
 		studente.setMail(studenteDto.getMail());
-		studente.setPas(studenteDto.getPas());
+		studente.setPassword(studenteDto.getPassword());
 		studente.setClasse(classe);
 
 		studentRepository.save(studente);
@@ -210,7 +210,7 @@ public class StudentService {
 		Studente studente = studentRepository.findById(newToken.getStudente().getId())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		
-		studente.setPas(password);
+		studente.setPassword(password);
 		
 		studentRepository.save(studente);
 		tokenRepository.delete(newToken);

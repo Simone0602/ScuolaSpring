@@ -6,19 +6,19 @@ public class StudenteDto {
 	private String nome;
 	private String cognome;
 	private String mail;
-	private String pas;
+	private String password;
 	private String userCode;
 	private String sezione;
 
 	public StudenteDto() {
 	}
 
-	public StudenteDto(String nome, String cognome, String mail, String pas, String userCode, String sezione) {
+	public StudenteDto(String nome, String cognome, String mail, String password, String userCode, String sezione) {
 		super();
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
-		this.pas = pas;
+		this.password = password;
 		this.userCode = userCode;
 		this.sezione = sezione;
 	}
@@ -63,12 +63,12 @@ public class StudenteDto {
 		this.mail = mail;
 	}
 
-	public String getPas() {
-		return pas;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPas(String pas) {
-		this.pas = pas;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getUserCode() {
@@ -82,6 +82,6 @@ public class StudenteDto {
 	@Override
 	public String toString() {
 		return "Studente [getId()=" + getId() + ", getNome()=" + getNome() + ", getCognome()=" + getCognome()
-				+ ", getMail()=" + getMail() + ", getPas()=" + getPas() + ", getUser()=" + getUserCode() + "]";
+				+ ", getMail()=" + getMail() + ", getpassword()=" + getPassword() + ", getUser()=" + getUserCode() + "]";
 	}
 }
