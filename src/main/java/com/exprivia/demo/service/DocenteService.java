@@ -33,7 +33,7 @@ public class DocenteService {
 			docenteDto.setNome(docente.getNome());
 			docenteDto.setCognome(docente.getCognome());
 			docenteDto.setMail(null);
-			docenteDto.setPas(null);
+			docenteDto.setPassword(null);
 			docenteDto.setMateria(docente.getMateria());
 			docenteDto.setCodiceFiscale(docente.getCodiceFiscale());
 
@@ -67,7 +67,7 @@ public class DocenteService {
 		docente.setCognome(docenteDto.getCognome());
 		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
 		docente.setMail(docenteDto.getMail());
-		docente.setPas(docenteDto.getPas());
+		docente.setPassword(docenteDto.getPassword());
 		docente.setMateria(docenteDto.getMateria());
 
 		if (!docenteRepository.existsByCodiceFiscale(docenteDto.getCodiceFiscale())) {
@@ -85,7 +85,7 @@ public class DocenteService {
 		newDocenteDto.setNome(docente.getNome());
 		newDocenteDto.setCognome(docente.getCognome());
 		newDocenteDto.setMail(docente.getMail());
-		newDocenteDto.setPas(null);
+		newDocenteDto.setPassword(null);
 		newDocenteDto.setMateria(docente.getMateria());
 		newDocenteDto.setCodiceFiscale(docente.getCodiceFiscale());
 
@@ -100,7 +100,7 @@ public class DocenteService {
 		docente.setNome(docenteDto.getNome());
 		docente.setCognome(docenteDto.getCognome());
 		docente.setMail(docenteDto.getMail());
-		docente.setPas(docenteDto.getPas());
+		docente.setPassword(docenteDto.getPassword());
 		docente.setMateria(docenteDto.getMateria());
 		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
 
