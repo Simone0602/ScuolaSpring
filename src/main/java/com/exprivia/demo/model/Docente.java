@@ -34,7 +34,7 @@ public class Docente {
 	@Column(name = "email")
 	private String mail;
 	@Column(name = "password")
-	private String pas;
+	private String password;
 	@Column(name = "codice_fiscale", length = 16)
 	private String codiceFiscale;
 	@Column(name = "materia")
@@ -55,14 +55,14 @@ public class Docente {
 	public Docente() {
 	}
 
-	public Docente(long id, String nome, String cognome, String mail, String pas, String codiceFiscale,
+	public Docente(long id, String nome, String cognome, String mail, String password, String codiceFiscale,
 			String materia) {
 		super();
 		this.id = id;
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
-		this.pas = pas;
+		this.password = password;
 		this.codiceFiscale = codiceFiscale;
 		this.materia = materia;
 	}
@@ -108,12 +108,12 @@ public class Docente {
 		this.mail = mail;
 	}
 
-	public String getPas() {
-		return pas;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPas(String pas) {
-		this.pas = pas;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getMateria() {
@@ -134,7 +134,7 @@ public class Docente {
 
 	@Override
 	public String toString() {
-		return "Docente [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas=" + getPas()
+		return "Docente [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas=" + getPassword()
 				+ ", materia=" + getMateria() + "]";
 	}
 }

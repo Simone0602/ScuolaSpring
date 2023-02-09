@@ -6,18 +6,18 @@ public class DocenteDto {
 	private String nome;
 	private String cognome;
 	private String mail;
-	private String pas;
+	private String password;
 	private String materia;
 	private String codiceFiscale;
 
 	public DocenteDto() {
 	}
 
-	public DocenteDto(String nome, String cognome, String mail, String pas, String materia, String codiceFiscale) {
+	public DocenteDto(String nome, String cognome, String mail, String password, String materia, String codiceFiscale) {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
-		this.pas = pas;
+		this.password = password;
 		this.materia = materia;
 		this.codiceFiscale = codiceFiscale;
 	}
@@ -54,12 +54,12 @@ public class DocenteDto {
 		this.mail = mail;
 	}
 
-	public String getPas() {
-		return pas;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPas(String pas) {
-		this.pas = pas;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getMateria() {
@@ -81,7 +81,7 @@ public class DocenteDto {
 	@Override
 	public String toString() {
 		return "DocenteDto [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas="
-				+ getPas() + ", materia=" + getMateria() + "]";
+				+ getPassword() + ", materia=" + getMateria() + "]";
 	}
 
 }
