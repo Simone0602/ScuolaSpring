@@ -137,7 +137,7 @@ public class StudentService {
 		studenteDtoLoggato.setCognome(studente.getCognome());
 		studenteDtoLoggato.setUserCode(null);
 		studenteDtoLoggato.setMail(studente.getMail());
-		studenteDtoLoggato.setPassword(studente.getPassword());
+		studenteDtoLoggato.setPassword(null);
 		studenteDtoLoggato.setSezione(studente.getClasse().getSezione());
 
 		return studenteDtoLoggato;
