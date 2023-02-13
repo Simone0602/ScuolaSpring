@@ -76,23 +76,6 @@ public class StudentService {
 		return studentiDto;
 	}
 
-	// SERVE PER L'UTENTE
-	public List<StudenteDto> findAllStudentBySezione(String sezione) {
-		List<StudenteDto> studentiDto = new ArrayList<>();
-		List<Studente> studenti = classRepository.findBySezione(sezione).get().getStudenti();
-
-		for (Studente studente : studenti) {
-			StudenteDto studenteDto = new StudenteDto();
-
-			studenteDto = conversioneStudente_StudenteDto(studente);
-			studenteDto.setUserCode(null);
-			studenteDto.setPassword(null);
-
-			studentiDto.add(studenteDto);
-		}
-		return studentiDto;
-	}
-
 	// SERVE SOLO PER LA SEGRETERIA
 	public String addStudent(StudenteDto studenteDto) {
 		Studente studente = new Studente();
@@ -239,7 +222,7 @@ public class StudentService {
 		return val;
 	}
 	
-	private StudenteDto conversioneStudente_StudenteDto(Studente studente) {
+	static StudenteDto conversioneStudente_StudenteDto(Studente studente) {
 		StudenteDto studenteDto = new StudenteDto();
 		
 		studenteDto.setNome(studente.getNome());

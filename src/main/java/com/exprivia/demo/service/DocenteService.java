@@ -8,9 +8,13 @@ import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.DocenteDto;
+import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Docente;
+import com.exprivia.demo.model.Studente;
+import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.DocenteRepo;
 
 @Service
@@ -119,4 +123,5 @@ public class DocenteService {
 		return "Docente non presente";
 
 	}
+
 }

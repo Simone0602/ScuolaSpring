@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.DocenteDto;
+import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.service.DocenteService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping(path = "docente")
 public class DocenteController {
 	
@@ -29,7 +31,6 @@ public class DocenteController {
 	}
 	
 	//SERVE ALLO STUDENTE DI VEDERE TUTTI GLI INSEGNANTI
-	@CrossOrigin
 	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<DocenteDto>> getAllDocenti() {
 		List<DocenteDto> docenti = service.findAllDocenti();
@@ -61,4 +62,6 @@ public class DocenteController {
 		String messaggio = service.deleteDocente(codiceFiscale); 
 		return new ResponseEntity<>(messaggio, HttpStatus.OK); 
 	}
+	
+	
 }

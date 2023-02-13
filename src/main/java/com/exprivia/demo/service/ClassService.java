@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ClasseDto;
+import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.model.Classe;
+import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.ClassRepository;
 
 @Service
@@ -58,5 +60,21 @@ public class ClassService {
 		
 		
 		return newClasseDto;
+	}
+	
+	public List<StudenteDto> findAllStudentBySezione(String sezione) {
+		List<StudenteDto> studentiDto = new ArrayList<>();
+		List<Studente> studenti = repository.findBySezione(sezione).get().getStudenti();
+
+		for (Studente studente : studenti) {
+			StudenteDto studenteDto = new StudenteDto();
+
+			studenteDto = StudentService.conversioneStudente_StudenteDto(studente);
+			studenteDto.setUserCode(null);
+			studenteDto.setPassword(null);
+
+			studentiDto.add(studenteDto);
+		}
+		return studentiDto;
 	}
 }

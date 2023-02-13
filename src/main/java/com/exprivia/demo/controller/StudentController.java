@@ -47,12 +47,6 @@ public class StudentController {
 		List<StudenteDto> studenti = service.findAllStudentBySezione5("5");
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
-	//SERVE ALLO STUDENTE
-	@GetMapping(path = "/find/{sezione}")
-	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione(@PathVariable("sezione") String sezione) {
-		List<StudenteDto> studenti = service.findAllStudentBySezione(sezione);
-		return new ResponseEntity<>(studenti, HttpStatus.OK);
-	}
 
 	//SERVE ALLA SEGRETERIA
 	@PostMapping(path = "/add")
