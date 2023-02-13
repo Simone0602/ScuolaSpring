@@ -3,13 +3,18 @@ package com.exprivia.demo.service;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.exprivia.demo.dto.RegistroFamiglia;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.dto.ValutazioneDto;
+import com.exprivia.demo.enums.Materie;
 import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
@@ -19,6 +24,7 @@ import com.exprivia.demo.mail.SendMailStudenteService;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.model.Token;
+import com.exprivia.demo.model.Valutazione;
 import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.StudentRepo;
 import com.exprivia.demo.repository.TokenRepository;
@@ -48,12 +54,7 @@ public class StudentService {
 		Studente studente = studentRepository.findStudentByMail(mail)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 
-		studenteDto.setNome(studente.getNome());
-		studenteDto.setCognome(studente.getCognome());
-		studenteDto.setUserCode(studente.getUserCode());
-		studenteDto.setMail(studente.getMail());
-		studenteDto.setPassword(null);
-		studenteDto.setSezione(studente.getClasse().getSezione());
+		studenteDto = conversioneStudente_StudenteDto(studente);
 
 		return studenteDto;
 	}
@@ -67,12 +68,7 @@ public class StudentService {
 			StudenteDto studenteDto = new StudenteDto();
 			
 			if(studente.getClasse().getSezione().contains(numeroSezione)) {
-				studenteDto.setNome(studente.getNome());
-				studenteDto.setCognome(studente.getCognome());
-				studenteDto.setUserCode(studente.getUserCode());
-				studenteDto.setMail(studente.getMail());
-				studenteDto.setPassword(studente.getPassword());
-				studenteDto.setSezione(studente.getClasse().getSezione());
+				studenteDto = conversioneStudente_StudenteDto(studente);
 
 				studentiDto.add(studenteDto);
 			}
@@ -88,12 +84,9 @@ public class StudentService {
 		for (Studente studente : studenti) {
 			StudenteDto studenteDto = new StudenteDto();
 
-			studenteDto.setNome(studente.getNome());
-			studenteDto.setCognome(studente.getCognome());
+			studenteDto = conversioneStudente_StudenteDto(studente);
 			studenteDto.setUserCode(null);
-			studenteDto.setMail(studente.getMail());
 			studenteDto.setPassword(null);
-			studenteDto.setSezione(studente.getClasse().getSezione());
 
 			studentiDto.add(studenteDto);
 		}
@@ -133,29 +126,17 @@ public class StudentService {
 			throw new IllegalPasswordException("Password errata");
 		}
 		
-		studenteDtoLoggato.setNome(studente.getNome());
-		studenteDtoLoggato.setCognome(studente.getCognome());
+		studenteDtoLoggato = conversioneStudente_StudenteDto(studente);
 		studenteDtoLoggato.setUserCode(null);
-		studenteDtoLoggato.setMail(studente.getMail());
 		studenteDtoLoggato.setPassword(null);
-		studenteDtoLoggato.setSezione(studente.getClasse().getSezione());
 
 		return studenteDtoLoggato;
 	}
 
 	//UPDATE
 	public StudenteDto updateStudent(StudenteDto studenteDto) {
-		StudenteDto newStudenteDto = new StudenteDto();
 		Studente studente = setStudente_studenteDto(studenteDto);
-
-		newStudenteDto.setNome(studente.getNome());
-		newStudenteDto.setCognome(studente.getCognome());
-		newStudenteDto.setUserCode(studente.getUserCode());
-		newStudenteDto.setMail(studente.getMail());
-		newStudenteDto.setPassword(studente.getPassword());
-		newStudenteDto.setSezione(studente.getClasse().getSezione());
-
-		return newStudenteDto;
+		return conversioneStudente_StudenteDto(studente);
 	}
 	//METODO USATO NELL'UPDATE
 	private Studente setStudente_studenteDto(StudenteDto studenteDto) {
@@ -175,12 +156,13 @@ public class StudentService {
 		return studente;
 	}
 
+	//DELETE STUDENTE
 	public String deleteStudent(String userCode) {
 		Studente studente = studentRepository.findStudentByUserCode(userCode)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		if (studente != null) {
 			studentRepository.deleteById(studente.getId());
-			return "utente eliminato";
+			return "Utente eliminato";
 		}
 		return "Utente non presente";
 	}
@@ -231,5 +213,42 @@ public class StudentService {
 			}
 		}
 		throw new NotFoundTokenException("Token scaduto");
+	}
+	
+	public RegistroFamiglia getVoti(String email) {
+		Studente studente = studentRepository.findStudentByMail(email)
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
+		RegistroFamiglia registroFamiglia = new RegistroFamiglia();
+		
+		HashMap<Materie, List<ValutazioneDto>> voti = new HashMap<>();
+		Iterator<Valutazione> iter = studente.getVoti().iterator();
+		while(iter.hasNext()) {
+			Valutazione voto = iter.next();
+			ValutazioneDto votoDto = new ValutazioneDto(voto.getVoto(), voto.getData());
+			
+			voti.computeIfPresent(voto.getMateria().getMateria(), (key, val) -> getList(val, votoDto));
+			voti.computeIfAbsent(voto.getMateria().getMateria(), k -> new ArrayList<ValutazioneDto>() {{ add(votoDto); }});
+		}
+		
+		registroFamiglia.setListaVoti_materie(voti);
+		
+		return registroFamiglia;
+	}
+	private List<ValutazioneDto> getList(List<ValutazioneDto> val, ValutazioneDto voto){
+		val.add(voto);
+		return val;
+	}
+	
+	private StudenteDto conversioneStudente_StudenteDto(Studente studente) {
+		StudenteDto studenteDto = new StudenteDto();
+		
+		studenteDto.setNome(studente.getNome());
+		studenteDto.setCognome(studente.getCognome());
+		studenteDto.setMail(studente.getMail());
+		studenteDto.setPassword(studente.getPassword());
+		studenteDto.setUserCode(studente.getUserCode());
+		studenteDto.setSezione(studente.getClasse().getSezione());
+		
+		return studenteDto;
 	}
 }

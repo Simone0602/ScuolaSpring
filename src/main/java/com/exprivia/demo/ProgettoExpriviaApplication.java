@@ -22,7 +22,7 @@ public class ProgettoExpriviaApplication {
         mailSender.setPort(587);
 
         mailSender.setUsername("ProgettoExprivia@gmail.com");
-        mailSender.setPassword("aiyrpkvssicfkyfo");
+        mailSender.setPassword("yzfutfqichhzvygk");
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");

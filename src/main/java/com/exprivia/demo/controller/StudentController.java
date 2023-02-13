@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exprivia.demo.dto.RegistroFamiglia;
 import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.exception.DontSendEmailException;
 import com.exprivia.demo.exception.IllegalMailException;
@@ -24,6 +25,7 @@ import com.exprivia.demo.exception.NotFoundTokenException;
 import com.exprivia.demo.service.StudentService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping(path = "studente")
 public class StudentController {
 
@@ -34,21 +36,18 @@ public class StudentController {
 	}
 	
 	//SERVE ALLA SEGRETERIA
-	@CrossOrigin
 	@GetMapping(path = "/findStudent/{mail}")
 	public ResponseEntity<StudenteDto> getStudentByMail(@PathVariable("mail") String mail) {
 		StudenteDto studente = service.findStudentByMail(mail);
 		return new ResponseEntity<>(studente, HttpStatus.OK);
 	}
 	//SERVE ALLA SEGRETERIA PER TROVARE TUTTI QUELLI DELL'ULTIMO ANNO
-	@CrossOrigin
 	@GetMapping(path = "/findAllStudent")
 	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione5(){
 		List<StudenteDto> studenti = service.findAllStudentBySezione5("5");
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
 	//SERVE ALLO STUDENTE
-	@CrossOrigin
 	@GetMapping(path = "/find/{sezione}")
 	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione(@PathVariable("sezione") String sezione) {
 		List<StudenteDto> studenti = service.findAllStudentBySezione(sezione);
@@ -56,14 +55,12 @@ public class StudentController {
 	}
 
 	//SERVE ALLA SEGRETERIA
-	@CrossOrigin
 	@PostMapping(path = "/add")
 	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto) {
 		String message = service.addStudent(studenteDto);
 		return new ResponseEntity<>(message, HttpStatus.CREATED);
 	}
 	//SERVE ALLO STUDENTE PER LOGGARSI (INSERIMENTO DI USERCODE E PASS)
-	@CrossOrigin
 	@PostMapping(path = "/loginStudente")
 	public ResponseEntity<Object> loginStudent(@RequestBody StudenteDto studenteDto){
 		try {
@@ -76,7 +73,6 @@ public class StudentController {
 		}
 	}
 	//SERVE PER INVIARE L'EMAIL
-	@CrossOrigin
 	@PostMapping(path = "/sendEmail/{tipoUser}")
 	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto, @PathVariable("tipoUser") String tipoUser) throws UnsupportedEncodingException{
 		try {
@@ -91,7 +87,6 @@ public class StudentController {
 		}
 	}
 	//SERVE PER POTER OTTENERE IL TOKEN
-	@CrossOrigin
 	@PostMapping(path = "/getToken")
 	public ResponseEntity<String> getToken(@RequestBody String userCode){
 		try {
@@ -105,14 +100,12 @@ public class StudentController {
 	}
 	
 	//SERVE ALLA SEGRETERIA PER CAMBIARE I PARAMETRI DELLO STUDENTE
-	@CrossOrigin
 	@PutMapping(path = "/update")
 	public ResponseEntity<StudenteDto> updateStudent(@RequestBody StudenteDto studenteDto) {
 		StudenteDto studente = service.updateStudent(studenteDto);
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
 	//SERVE PER FARE L'UPDATE DELLA PASSWORD
-	@CrossOrigin
 	@PutMapping(path = "/updatePassword/{token}")
 	public ResponseEntity<String> updatePassword(@RequestBody String password, @PathVariable("token") String token){
 		try {
@@ -126,10 +119,19 @@ public class StudentController {
 	}
 	
 	//SERVE ALLA SEGRETERIA PER ELIMINARE GLI STUDENTI CHE HANNO COMPLETATO GLI STUDI
-	@CrossOrigin
 	@DeleteMapping(path = "/delete/{userCode}")
 	public ResponseEntity<String> deleteStudent(@PathVariable("useCode") String userCode) {
 		String message = service.deleteStudent(userCode);
 		return new ResponseEntity<>(message, HttpStatus.OK);
+	}
+	
+	@GetMapping(path = "/{email}/getRegistro")
+	public ResponseEntity<RegistroFamiglia> getVoti(@PathVariable("email") String email){
+		try {
+			RegistroFamiglia registroFamiglia = service.getVoti(email);
+			return new ResponseEntity<>(registroFamiglia, HttpStatus.OK);
+		}catch(NotFoundStudentException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

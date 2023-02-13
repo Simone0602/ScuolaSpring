@@ -45,6 +45,10 @@ public class Studente {
 	@OneToMany(mappedBy = "studente")
 	@JsonManagedReference
 	private List<Token> tokens;
+	
+	@OneToMany(mappedBy = "studente")
+	@JsonManagedReference
+	private List<Valutazione> voti;
 
 	public Studente() {
 	}
@@ -58,6 +62,13 @@ public class Studente {
 		this.classe = classe;
 	}
 
+	public List<Valutazione> getVoti() {
+		return voti;
+	}
+
+	public void setVoti(List<Valutazione> voti) {
+		this.voti = voti;
+	}
 	
 	public List<Token> getTokens() {
 		return tokens;
