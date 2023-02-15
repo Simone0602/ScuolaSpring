@@ -55,10 +55,10 @@ public class StudentController {
 		return new ResponseEntity<>(message, HttpStatus.CREATED);
 	}
 	//SERVE ALLO STUDENTE PER LOGGARSI (INSERIMENTO DI USERCODE E PASS)
-	@PostMapping(path = "/loginStudente")
+	@PostMapping(path = "/login")
 	public ResponseEntity<Object> loginStudent(@RequestBody StudenteDto studenteDto){
 		try {
-			StudenteDto studente = service.findStudent(studenteDto);
+			StudenteDto studente = service.login(studenteDto);
 			return new ResponseEntity<>(studente, HttpStatus.OK);
 		}catch(NotFoundStudentException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

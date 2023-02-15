@@ -1,33 +1,27 @@
 package com.exprivia.demo.dto;
 
+import java.util.List;
+
 public class DocenteDto {
 
-	private long id;
 	private String nome;
 	private String cognome;
 	private String mail;
 	private String password;
-	private String materia;
+	private List<String> materie;
 	private String codiceFiscale;
 
 	public DocenteDto() {
 	}
 
-	public DocenteDto(String nome, String cognome, String mail, String password, String materia, String codiceFiscale) {
+	public DocenteDto(String nome, String cognome, String mail, String password, String materia, String codiceFiscale,
+			List<String> materie) {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.password = password;
-		this.materia = materia;
+		this.materie = materie;
 		this.codiceFiscale = codiceFiscale;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public String getNome() {
@@ -62,12 +56,12 @@ public class DocenteDto {
 		this.password = password;
 	}
 
-	public String getMateria() {
-		return materia;
+	public List<String> getMaterie() {
+		return materie;
 	}
 
-	public void setMateria(String materia) {
-		this.materia = materia;
+	public void setMaterie(List<String> materie) {
+		this.materie = materie;
 	}
 
 	public String getCodiceFiscale() {
@@ -76,12 +70,6 @@ public class DocenteDto {
 
 	public void setCodiceFiscale(String codiceFiscale) {
 		this.codiceFiscale = codiceFiscale;
-	}
-
-	@Override
-	public String toString() {
-		return "DocenteDto [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas="
-				+ getPassword() + ", materia=" + getMateria() + "]";
 	}
 
 }

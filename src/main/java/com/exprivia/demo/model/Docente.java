@@ -1,6 +1,7 @@
 package com.exprivia.demo.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -37,8 +38,6 @@ public class Docente {
 	private String password;
 	@Column(name = "codice_fiscale", length = 16)
 	private String codiceFiscale;
-	@Column(name = "materia")
-	private String materia;
 	
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinTable(name = "docente_classe_table", 
@@ -51,12 +50,24 @@ public class Docente {
 			)
 	@JsonManagedReference
 	private List<Classe> classi;
+	
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "docente_materia_table", 
+				joinColumns = {
+						@JoinColumn(name = "docente_id", referencedColumnName = "docente_id")
+				},
+				inverseJoinColumns = {
+						@JoinColumn(name = "materia_id", referencedColumnName = "materia_id")
+				}
+			)
+	@JsonManagedReference
+	private Set<Materia> materie;
 
 	public Docente() {
 	}
 
 	public Docente(long id, String nome, String cognome, String mail, String password, String codiceFiscale,
-			String materia) {
+			List<Classe> classi, Set<Materia> materie) {
 		super();
 		this.id = id;
 		this.nome = nome;
@@ -64,10 +75,10 @@ public class Docente {
 		this.mail = mail;
 		this.password = password;
 		this.codiceFiscale = codiceFiscale;
-		this.materia = materia;
+		this.classi = classi;
+		this.materie = materie;
 	}
 	
-
 	public List<Classe> getClassi() {
 		return classi;
 	}
@@ -116,14 +127,6 @@ public class Docente {
 		this.password = password;
 	}
 
-	public String getMateria() {
-		return materia;
-	}
-
-	public void setMateria(String materia) {
-		this.materia = materia;
-	}
-
 	public String getCodiceFiscale() {
 		return codiceFiscale;
 	}
@@ -132,9 +135,11 @@ public class Docente {
 		this.codiceFiscale = codiceFiscale;
 	}
 
-	@Override
-	public String toString() {
-		return "Docente [nome=" + getNome() + ", cognome=" + getCognome() + ", mail=" + getMail() + ", pas=" + getPassword()
-				+ ", materia=" + getMateria() + "]";
+	public Set<Materia> getMaterie() {
+		return materie;
+	}
+
+	public void setMaterie(Set<Materia> materie) {
+		this.materie = materie;
 	}
 }

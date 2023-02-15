@@ -3,27 +3,31 @@ package com.exprivia.demo.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.DocenteDto;
-import com.exprivia.demo.dto.StudenteDto;
-import com.exprivia.demo.exception.NotFoundClasseException;
+import com.exprivia.demo.enums.Materie;
+import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Docente;
-import com.exprivia.demo.model.Studente;
-import com.exprivia.demo.repository.ClassRepository;
+import com.exprivia.demo.model.Materia;
 import com.exprivia.demo.repository.DocenteRepo;
+import com.exprivia.demo.repository.MateriaRepository;
 
 @Service
 public class DocenteService {
 
 	private final DocenteRepo docenteRepository;
+	private final MateriaRepository materiaRepository;
 
-	public DocenteService(DocenteRepo docenteRepository) {
+	public DocenteService(DocenteRepo docenteRepository, MateriaRepository materiaRepository) {
 		this.docenteRepository = docenteRepository;
+		this.materiaRepository = materiaRepository;
 	}
 
 	// SERVE ALLO STUDENTE
@@ -38,7 +42,7 @@ public class DocenteService {
 			docenteDto.setCognome(docente.getCognome());
 			docenteDto.setMail(null);
 			docenteDto.setPassword(null);
-			docenteDto.setMateria(docente.getMateria());
+			docenteDto.setMaterie(getMaterie(docente));
 			docenteDto.setCodiceFiscale(docente.getCodiceFiscale());
 
 			docentiDto.add(docenteDto);
@@ -63,25 +67,49 @@ public class DocenteService {
 		return classiDto;
 	}
 
-	//SERVE ALLA SEGRETERIA
+	// SERVE ALLA SEGRETERIA
 	public String addDocente(DocenteDto docenteDto) {
 		Docente docente = new Docente();
 
-		docente.setNome(docenteDto.getNome());
-		docente.setCognome(docenteDto.getCognome());
-		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
-		docente.setMail(docenteDto.getMail());
-		docente.setPassword(docenteDto.getPassword());
-		docente.setMateria(docenteDto.getMateria());
-
 		if (!docenteRepository.existsByCodiceFiscale(docenteDto.getCodiceFiscale())) {
+			Set<Materia> materie = docenteDto.getMaterie().stream()
+					.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x))).filter(x -> x != null)
+					.collect(Collectors.toSet());
+
+			docente.setNome(docenteDto.getNome());
+			docente.setCognome(docenteDto.getCognome());
+			docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
+			docente.setMail(docenteDto.getMail());
+			docente.setPassword(docenteDto.getPassword());
+			docente.setMaterie(materie);
+
 			docenteRepository.save(docente);
 			return "Docente salvato";
 		}
 		return "Docente già presente";
 	}
 
-	//SERVE ALLA SEGRETERIA
+	// LOGIN DOCENTE
+	public DocenteDto login(DocenteDto docenteDto) {
+		DocenteDto docenteDtoLoggato = new DocenteDto();
+		Docente docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
+				.orElseThrow(() -> new NotFoundDocenteException("Docente non trovato"));
+
+		if (!docente.getPassword().equals(docenteDto.getPassword())) {
+			throw new IllegalPasswordException("Password errata");
+		}
+
+		docenteDtoLoggato.setNome(docente.getNome());
+		docenteDtoLoggato.setCognome(docente.getCognome());
+		docenteDtoLoggato.setMail(docente.getMail());
+		docenteDtoLoggato.setPassword(docente.getPassword());
+		docenteDtoLoggato.setCodiceFiscale(docente.getCodiceFiscale());
+		docenteDtoLoggato.setMaterie(getMaterie(docente));
+
+		return docenteDtoLoggato;
+	}
+
+	// SERVE ALLA SEGRETERIA
 	public DocenteDto updateDocente(DocenteDto docenteDto) {
 		DocenteDto newDocenteDto = new DocenteDto();
 		Docente docente = setDocente_docenteDto(docenteDto);
@@ -90,22 +118,27 @@ public class DocenteService {
 		newDocenteDto.setCognome(docente.getCognome());
 		newDocenteDto.setMail(docente.getMail());
 		newDocenteDto.setPassword(null);
-		newDocenteDto.setMateria(docente.getMateria());
+		newDocenteDto.setMaterie(getMaterie(docente));
 		newDocenteDto.setCodiceFiscale(docente.getCodiceFiscale());
 
 		return newDocenteDto;
 	}
+
 	// METODO USATO NELL'UPDATE
 	public Docente setDocente_docenteDto(DocenteDto docenteDto) {
 		Docente docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
 				.orElseThrow(() -> new NotFoundDocenteException("Docente non esistente"));
+
+		Set<Materia> materie = docenteDto.getMaterie().stream()
+				.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x))).filter(x -> x != null)
+				.collect(Collectors.toSet());
 
 		docente.setId(docente.getId());
 		docente.setNome(docenteDto.getNome());
 		docente.setCognome(docenteDto.getCognome());
 		docente.setMail(docenteDto.getMail());
 		docente.setPassword(docenteDto.getPassword());
-		docente.setMateria(docenteDto.getMateria());
+		docente.setMaterie(materie);
 		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
 
 		docenteRepository.save(docente);
@@ -121,7 +154,11 @@ public class DocenteService {
 			return "Docente eliminato";
 		}
 		return "Docente non presente";
-
 	}
 
+	private List<String> getMaterie(Docente docente) {
+		List<String> materie = docente.getMaterie().stream().map(x -> x.getMateria().name())
+				.collect(Collectors.toList());
+		return materie;
+	}
 }
