@@ -100,7 +100,7 @@ public class StudentService {
 	}
 	
 	//LOGIN PER LO STUDENTE
-	public StudenteDto findStudent(StudenteDto studenteDto) {
+	public StudenteDto login(StudenteDto studenteDto) {
 		StudenteDto studenteDtoLoggato = new StudenteDto();
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
@@ -110,8 +110,6 @@ public class StudentService {
 		}
 		
 		studenteDtoLoggato = conversioneStudente_StudenteDto(studente);
-		studenteDtoLoggato.setUserCode(null);
-		studenteDtoLoggato.setPassword(null);
 
 		return studenteDtoLoggato;
 	}
