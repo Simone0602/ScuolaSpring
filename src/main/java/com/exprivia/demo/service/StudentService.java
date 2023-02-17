@@ -115,26 +115,9 @@ public class StudentService {
 	}
 
 	//UPDATE
-	public StudenteDto updateStudent(StudenteDto studenteDto) {
-		Studente studente = setStudente_studenteDto(studenteDto);
+	public StudenteDto updateStudentBySegreteria(StudenteDto studenteDto) {
+		Studente studente = conversioneStudenteDto_Studente(studenteDto);
 		return conversioneStudente_StudenteDto(studente);
-	}
-	//METODO USATO NELL'UPDATE
-	private Studente setStudente_studenteDto(StudenteDto studenteDto) {
-		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		Classe classe = classRepository.findBySezione(studenteDto.getSezione())
-				.orElseThrow(() -> new NotFoundSezioneException("Sezione non trovata"));
-
-		studente.setNome(studenteDto.getNome());
-		studente.setCognome(studenteDto.getCognome());
-		studente.setMail(studenteDto.getMail());
-		studente.setPassword(studenteDto.getPassword());
-		studente.setClasse(classe);
-
-		studentRepository.save(studente);
-
-		return studente;
 	}
 
 	//DELETE STUDENTE
@@ -196,6 +179,17 @@ public class StudentService {
 		throw new NotFoundTokenException("Token scaduto");
 	}
 	
+	public String updateStudent(StudenteDto studenteDto) {
+		Studente studente = conversioneStudenteDto_Studente(studenteDto);
+		
+		if(studentRepository.findById(studente.getId()).isPresent()) {
+			if(studente.getMail().equals(studenteDto.getMail()) && studente.getPassword().equals(studenteDto.getPassword())) {
+				return "Studente aggiornato";
+			}
+		}
+		return "Studente non aggiornato! Riprovare";
+	}
+	
 	public RegistroFamiglia getVoti(String email) {
 		Studente studente = studentRepository.findStudentByMail(email)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
@@ -231,5 +225,23 @@ public class StudentService {
 		studenteDto.setSezione(studente.getClasse().getSezione());
 		
 		return studenteDto;
+	}
+	
+	private Studente conversioneStudenteDto_Studente(StudenteDto studenteDto) {
+		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
+		Classe classe = classRepository.findBySezione(studenteDto.getSezione())
+				.orElseThrow(() -> new NotFoundSezioneException("Sezione non trovata"));
+
+		studente.setNome(studenteDto.getNome());
+		studente.setCognome(studenteDto.getCognome());
+		studente.setMail(studenteDto.getMail());
+		studente.setPassword(studenteDto.getPassword());
+		studente.setUserCode(studenteDto.getUserCode());
+		studente.setClasse(classe);
+
+		studentRepository.save(studente);
+
+		return studente;
 	}
 }
