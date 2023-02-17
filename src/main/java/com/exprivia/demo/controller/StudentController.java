@@ -20,6 +20,7 @@ import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.exception.DontSendEmailException;
 import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
+import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.exception.NotFoundTokenException;
 import com.exprivia.demo.service.StudentService;
@@ -94,9 +95,9 @@ public class StudentController {
 	}
 	
 	//SERVE ALLA SEGRETERIA PER CAMBIARE I PARAMETRI DELLO STUDENTE
-	@PutMapping(path = "/update")
+	@PutMapping(path = "/update-by-segreteria")
 	public ResponseEntity<StudenteDto> updateStudent(@RequestBody StudenteDto studenteDto) {
-		StudenteDto studente = service.updateStudent(studenteDto);
+		StudenteDto studente = service.updateStudentBySegreteria(studenteDto);
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
 	//SERVE PER FARE L'UPDATE DELLA PASSWORD
@@ -108,6 +109,18 @@ public class StudentController {
 		}catch(NotFoundTokenException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}catch(NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+	//SERVE ALLO STUDENTE PER CAMBIARE LA PASSWORD E LA EMAIL
+	@PutMapping(path = "update")
+	public ResponseEntity<String> updateStudente(@RequestBody StudenteDto studenteDto){
+		try {
+			String message = service.updateStudent(studenteDto);
+			return new ResponseEntity<>(message, HttpStatus.CREATED);
+		}catch(NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}catch(NotFoundClasseException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
