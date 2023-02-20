@@ -118,9 +118,9 @@ public class StudentController {
 	@GetMapping(value = "/send-message")
 	public ResponseEntity<String> sendSMS() {
 
-		Twilio.init("AC0d4c8ca93f90fb78bc50f6c6f0801ce4", "9cf2b0c4c5b37330731da4e851ffabe9");
+		Twilio.init("AC0d344551b0b5b6cf21f44b37e4832e30", "c69dd633a487c9993157f34da7096405");
 
-		Message.creator(new PhoneNumber("+393895414759"), new PhoneNumber("+15005550006"), "Ciauu zuzzi :)").create();
+		Message.creator(new PhoneNumber("+393895414759"), new PhoneNumber("+15005550006"), "prova messaggio").create();
 
 		return new ResponseEntity<String>("Invio messaggio riuscito", HttpStatus.OK);
 	}
