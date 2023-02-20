@@ -19,6 +19,7 @@ public class ClassService {
 		this.repository = repository;
 	}
 
+	//TROVA TUTTE LE CLASSI
 	public List<ClasseDto> findAllClassi() {
 		List<Classe> classi = repository.findAll();
 		List<ClasseDto> classiDto = new ArrayList<>();
@@ -37,7 +38,8 @@ public class ClassService {
 
 		return classiDto;
 	}
-
+	
+	//AGGIORNA LE CLASSI
 	public ClasseDto updateClasse(ClasseDto classeDto) {
 		ClasseDto newClasseDto = new ClasseDto();
 		Classe classe = repository.findClasseById(classeDto.getId())
@@ -62,6 +64,7 @@ public class ClassService {
 		return newClasseDto;
 	}
 	
+	//TROVA TUTTI GLI STUDENTI DI UNA DETERMINATA CLASSE
 	public List<StudenteDto> findAllStudentBySezione(String sezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
 		List<Studente> studenti = repository.findBySezione(sezione).get().getStudenti();

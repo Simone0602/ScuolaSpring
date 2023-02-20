@@ -49,6 +49,7 @@ public class StudentService {
 	}
 
 	/* Segreteria */
+	//ricerca di uno studente tremite mail
 	public StudenteDto findStudentByMail(String mail) {
 		StudenteDto studenteDto = new StudenteDto();
 		Studente studente = studentRepository.findStudentByMail(mail)
@@ -59,6 +60,7 @@ public class StudentService {
 		return studenteDto;
 	}
 	
+	//ricerca studente dell'ultimo anno
 	public List<StudenteDto> findAllStudentBySezione5(String numeroSezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
 		List<Studente> studenti = studentRepository.findAll();
@@ -75,6 +77,7 @@ public class StudentService {
 		return studentiDto;
 	}
 
+	//aggiungere uno studente
 	public String addStudent(StudenteDto studenteDto) {
 		Studente studente = new Studente();
 		Classe classe = classRepository.findBySezione(studenteDto.getSezione())
@@ -97,11 +100,13 @@ public class StudentService {
 		return "Studente già presente";
 	}
 	
+	//aggiornamento dati studente
 	public StudenteDto updateStudentBySegreteria(StudenteDto studenteDto) {
 		Studente studente = conversioneStudenteDto_Studente(studenteDto);
 		return conversioneStudente_StudenteDto(studente);
 	}
 	
+	//elimina studente 
 	public String deleteStudent(String userCode) {
 		Studente studente = studentRepository.findStudentByUserCode(userCode)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
@@ -128,6 +133,7 @@ public class StudentService {
 	}
 	
 	/* Metodi utilizzo send mail e update password */
+	//reset della password
 	public String resetPassword(StudenteDto studenteDto, String tipoUser) throws UnsupportedEncodingException {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
@@ -144,6 +150,7 @@ public class StudentService {
 		
 		return mailService.sendEmail(studente.getMail(), resetToken, tipoUser);
 	}
+	//aggiornamento password
 	public String updatePassword(String password, String token) {
 		Token newToken = tokenRepository.findByIdAndDate(token, LocalDate.now())
 				.orElseThrow(() -> new NotFoundTokenException("Token non trovato o scaduto"));
@@ -158,6 +165,7 @@ public class StudentService {
 	}
 	
 	/* update studente tramite dati anagrafici */
+	//aggiorna studente
 	public String updateStudent(StudenteDto studenteDto) {
 		Studente studente = conversioneStudenteDto_Studente(studenteDto);
 		
@@ -170,6 +178,7 @@ public class StudentService {
 	}
 	
 	/* get registro delle materie e voti */
+	//stampa i voti degli studenti
 	public RegistroFamiglia getVoti(String email) {
 		Studente studente = studentRepository.findStudentByMail(email)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));

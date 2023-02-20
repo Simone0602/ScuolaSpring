@@ -31,6 +31,7 @@ public class DocenteService {
 	}
 
 	// SERVE ALLO STUDENTE
+	// TROVA TUTTI I DOCENTI
 	public List<DocenteDto> findAllDocenti() {
 		List<Docente> docenti = docenteRepository.findAll();
 		List<DocenteDto> docentiDto = new ArrayList<>();
@@ -51,6 +52,7 @@ public class DocenteService {
 	}
 
 	// SERVE ALLO STUDENTE
+	// TROVA UN DOCENTE TRAMITE CODICE FISCALE
 	public List<ClasseDto> findAllClassByDocente(String codiceFiscale) {
 		List<ClasseDto> classiDto = new ArrayList<>();
 		List<Classe> classi = docenteRepository.findDocenteByCodiceFiscale(codiceFiscale).get().getClassi();
@@ -68,6 +70,7 @@ public class DocenteService {
 	}
 
 	// SERVE ALLA SEGRETERIA
+	// AGGIUNGE UN DOCENTE
 	public String addDocente(DocenteDto docenteDto) {
 		Docente docente = new Docente();
 
@@ -110,6 +113,7 @@ public class DocenteService {
 	}
 
 	// SERVE ALLA SEGRETERIA
+	// AGGIORNAMENTO DATI DOCENTE
 	public DocenteDto updateDocente(DocenteDto docenteDto) {
 		DocenteDto newDocenteDto = new DocenteDto();
 		Docente docente = setDocente_docenteDto(docenteDto);
@@ -146,7 +150,8 @@ public class DocenteService {
 		return docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
 				.orElseThrow(() -> new NotFoundDocenteException("Docente non esistente"));
 	}
-
+	
+	// ELIMINA DATI DOCENTE TRAMITE CODICE FISCALE
 	public String deleteDocente(String codiceFiscale) {
 		Optional<Docente> docente = docenteRepository.findDocenteByCodiceFiscale(codiceFiscale);
 		if (docente.isPresent()) {
@@ -156,6 +161,7 @@ public class DocenteService {
 		return "Docente non presente";
 	}
 
+	// STAMPA LE MATERIE DI UN DOCENTE
 	private List<String> getMaterie(Docente docente) {
 		List<String> materie = docente.getMaterie().stream().map(x -> x.getMateria().name())
 				.collect(Collectors.toList());

@@ -53,6 +53,7 @@ public class StudentController {
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
 
+	//aggiungere uno studente
 	@PostMapping(path = "/add")
 	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto) {
 		String message = service.addStudent(studenteDto);
@@ -102,6 +103,7 @@ public class StudentController {
 		}
 	}
 
+	//cambio password
 	@PutMapping(path = "/update-password/{token}")
 	public ResponseEntity<String> updatePassword(@RequestBody String password, @PathVariable("token") String token) {
 		try {
@@ -114,7 +116,7 @@ public class StudentController {
 		}
 	}
 
-	/* invio messaggio tramite twillo */
+	/* invio messaggio tramite twilio */
 	@GetMapping(value = "/send-message")
 	public ResponseEntity<String> sendSMS() {
 
