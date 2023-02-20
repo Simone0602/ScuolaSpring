@@ -24,6 +24,9 @@ import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.exception.NotFoundTokenException;
 import com.exprivia.demo.service.StudentService;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -35,109 +38,113 @@ public class StudentController {
 	public StudentController(StudentService service) {
 		this.service = service;
 	}
-	
-	//SERVE ALLA SEGRETERIA
-	@GetMapping(path = "/findStudent/{mail}")
+
+	/* Segreteria */
+	@GetMapping(path = "/find-student/{mail}")
 	public ResponseEntity<StudenteDto> getStudentByMail(@PathVariable("mail") String mail) {
 		StudenteDto studente = service.findStudentByMail(mail);
 		return new ResponseEntity<>(studente, HttpStatus.OK);
 	}
-	//SERVE ALLA SEGRETERIA PER TROVARE TUTTI QUELLI DELL'ULTIMO ANNO
-	@GetMapping(path = "/findAllStudent")
-	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione5(){
+
+	// trovare tutti quelli dell'ultimo anno
+	@GetMapping(path = "/find-all-student")
+	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione5() {
 		List<StudenteDto> studenti = service.findAllStudentBySezione5("5");
 		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
 
-	//SERVE ALLA SEGRETERIA
 	@PostMapping(path = "/add")
 	public ResponseEntity<String> addStudent(@RequestBody StudenteDto studenteDto) {
 		String message = service.addStudent(studenteDto);
 		return new ResponseEntity<>(message, HttpStatus.CREATED);
 	}
-	//SERVE ALLO STUDENTE PER LOGGARSI (INSERIMENTO DI USERCODE E PASS)
-	@PostMapping(path = "/login")
-	public ResponseEntity<Object> loginStudent(@RequestBody StudenteDto studenteDto){
-		try {
-			StudenteDto studente = service.login(studenteDto);
-			return new ResponseEntity<>(studente, HttpStatus.OK);
-		}catch(NotFoundStudentException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}catch(IllegalPasswordException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-		}
-	}
-	//SERVE PER INVIARE L'EMAIL
-	@PostMapping(path = "/sendEmail/{tipoUser}")
-	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto, @PathVariable("tipoUser") String tipoUser) throws UnsupportedEncodingException{
-		try {
-			String message = service.resetPassword(studenteDto, tipoUser);
-			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
-		}catch(NotFoundStudentException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}catch(IllegalMailException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-		}catch(DontSendEmailException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
-		}
-	}
-	//SERVE PER POTER OTTENERE IL TOKEN
-	@PostMapping(path = "/getToken")
-	public ResponseEntity<String> getToken(@RequestBody String userCode){
-		try {
-			String newToken = service.getToken(userCode);
-			return new ResponseEntity<>(newToken, HttpStatus.OK);
-		}catch(NotFoundStudentException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}catch(NotFoundTokenException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-		}
-	}
-	
-	//SERVE ALLA SEGRETERIA PER CAMBIARE I PARAMETRI DELLO STUDENTE
+
+	// cambiare i parametri dello studente
 	@PutMapping(path = "/update-by-segreteria")
 	public ResponseEntity<StudenteDto> updateStudent(@RequestBody StudenteDto studenteDto) {
 		StudenteDto studente = service.updateStudentBySegreteria(studenteDto);
 		return new ResponseEntity<>(studente, HttpStatus.CREATED);
 	}
-	//SERVE PER FARE L'UPDATE DELLA PASSWORD
-	@PutMapping(path = "/updatePassword/{token}")
-	public ResponseEntity<String> updatePassword(@RequestBody String password, @PathVariable("token") String token){
-		try {
-			String message = service.updatePassword(password, token);
-			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
-		}catch(NotFoundTokenException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}catch(NotFoundStudentException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}
-	}
-	//SERVE ALLO STUDENTE PER CAMBIARE LA PASSWORD E LA EMAIL
-	@PutMapping(path = "update")
-	public ResponseEntity<String> updateStudente(@RequestBody StudenteDto studenteDto){
-		try {
-			String message = service.updateStudent(studenteDto);
-			return new ResponseEntity<>(message, HttpStatus.CREATED);
-		}catch(NotFoundStudentException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}catch(NotFoundClasseException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}
-	}
-	
-	//SERVE ALLA SEGRETERIA PER ELIMINARE GLI STUDENTI CHE HANNO COMPLETATO GLI STUDI
+
+	// per eliminare gli studenti che hanno terminato gli studi
 	@DeleteMapping(path = "/delete/{userCode}")
 	public ResponseEntity<String> deleteStudent(@PathVariable("useCode") String userCode) {
 		String message = service.deleteStudent(userCode);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
-	
+
+	/* Login */
+	@PostMapping(path = "/login")
+	public ResponseEntity<Object> loginStudent(@RequestBody StudenteDto studenteDto) {
+		try {
+			StudenteDto studente = service.login(studenteDto);
+			return new ResponseEntity<>(studente, HttpStatus.OK);
+		} catch (NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (IllegalPasswordException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	/* Metodi invio mail e update password */
+	@PostMapping(path = "/send-mail/{tipoUser}")
+	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto,
+			@PathVariable("tipoUser") String tipoUser) throws UnsupportedEncodingException {
+		try {
+			String message = service.resetPassword(studenteDto, tipoUser);
+			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
+		} catch (NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (IllegalMailException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+		} catch (DontSendEmailException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+
+	@PutMapping(path = "/update-password/{token}")
+	public ResponseEntity<String> updatePassword(@RequestBody String password, @PathVariable("token") String token) {
+		try {
+			String message = service.updatePassword(password, token);
+			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
+		} catch (NotFoundTokenException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/* invio messaggio tramite twillo */
+	@GetMapping(value = "/send-message")
+	public ResponseEntity<String> sendSMS() {
+
+		Twilio.init("AC0d4c8ca93f90fb78bc50f6c6f0801ce4", "9cf2b0c4c5b37330731da4e851ffabe9");
+
+		Message.creator(new PhoneNumber("+393895414759"), new PhoneNumber("+15005550006"), "Ciauu zuzzi :)").create();
+
+		return new ResponseEntity<String>("Invio messaggio riuscito", HttpStatus.OK);
+	}
+
+	/* update studente tramite dati anagrici */
+	@PutMapping(path = "update")
+	public ResponseEntity<String> updateStudente(@RequestBody StudenteDto studenteDto) {
+		try {
+			String message = service.updateStudent(studenteDto);
+			return new ResponseEntity<>(message, HttpStatus.CREATED);
+		} catch (NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (NotFoundClasseException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/* Metodo get lista di materie e voti */
 	@GetMapping(path = "/{email}/getRegistro")
-	public ResponseEntity<RegistroFamiglia> getVoti(@PathVariable("email") String email){
+	public ResponseEntity<RegistroFamiglia> getVoti(@PathVariable("email") String email) {
 		try {
 			RegistroFamiglia registroFamiglia = service.getVoti(email);
 			return new ResponseEntity<>(registroFamiglia, HttpStatus.OK);
-		}catch(NotFoundStudentException e) {
+		} catch (NotFoundStudentException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}

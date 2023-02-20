@@ -20,7 +20,7 @@ import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.exception.NotFoundTokenException;
-import com.exprivia.demo.mail.SendMailStudenteService;
+import com.exprivia.demo.mail.SendMailService;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.model.Token;
@@ -35,20 +35,20 @@ public class StudentService {
 	private final StudentRepo studentRepository;
 	private final ClassRepository classRepository;
 	private final TokenRepository tokenRepository;
-	private final SendMailStudenteService studenteMailService;
+	private final SendMailService mailService;
 
 	@Autowired
 	public StudentService(StudentRepo studentRepository, 
 			ClassRepository classRepository, 
 			TokenRepository tokenRepository, 
-			SendMailStudenteService studenteMailService) {
+			SendMailService mailService) {
 		this.studentRepository = studentRepository;
 		this.classRepository = classRepository;
 		this.tokenRepository = tokenRepository;
-		this.studenteMailService = studenteMailService;
+		this.mailService = mailService;
 	}
 
-	// SERVE SOLO ALLA SEGRETERIA PER TROVARE UNO STUDENTE
+	/* Segreteria */
 	public StudenteDto findStudentByMail(String mail) {
 		StudenteDto studenteDto = new StudenteDto();
 		Studente studente = studentRepository.findStudentByMail(mail)
@@ -59,7 +59,6 @@ public class StudentService {
 		return studenteDto;
 	}
 	
-	//SERVE ALLA SEGRETERIA
 	public List<StudenteDto> findAllStudentBySezione5(String numeroSezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
 		List<Studente> studenti = studentRepository.findAll();
@@ -76,7 +75,6 @@ public class StudentService {
 		return studentiDto;
 	}
 
-	// SERVE SOLO PER LA SEGRETERIA
 	public String addStudent(StudenteDto studenteDto) {
 		Studente studente = new Studente();
 		Classe classe = classRepository.findBySezione(studenteDto.getSezione())
@@ -99,7 +97,22 @@ public class StudentService {
 		return "Studente già presente";
 	}
 	
-	//LOGIN PER LO STUDENTE
+	public StudenteDto updateStudentBySegreteria(StudenteDto studenteDto) {
+		Studente studente = conversioneStudenteDto_Studente(studenteDto);
+		return conversioneStudente_StudenteDto(studente);
+	}
+	
+	public String deleteStudent(String userCode) {
+		Studente studente = studentRepository.findStudentByUserCode(userCode)
+				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
+		if (studente != null) {
+			studentRepository.deleteById(studente.getId());
+			return "Utente eliminato";
+		}
+		return "Utente non presente";
+	}
+	
+	/* login */
 	public StudenteDto login(StudenteDto studenteDto) {
 		StudenteDto studenteDtoLoggato = new StudenteDto();
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
@@ -113,25 +126,8 @@ public class StudentService {
 
 		return studenteDtoLoggato;
 	}
-
-	//UPDATE
-	public StudenteDto updateStudentBySegreteria(StudenteDto studenteDto) {
-		Studente studente = conversioneStudenteDto_Studente(studenteDto);
-		return conversioneStudente_StudenteDto(studente);
-	}
-
-	//DELETE STUDENTE
-	public String deleteStudent(String userCode) {
-		Studente studente = studentRepository.findStudentByUserCode(userCode)
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		if (studente != null) {
-			studentRepository.deleteById(studente.getId());
-			return "Utente eliminato";
-		}
-		return "Utente non presente";
-	}
 	
-	//METODO RESET PASSWORD
+	/* Metodi utilizzo send mail e update password */
 	public String resetPassword(StudenteDto studenteDto, String tipoUser) throws UnsupportedEncodingException {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
@@ -146,10 +142,8 @@ public class StudentService {
 		Token token = new Token(resetToken, studente);
 		tokenRepository.save(token);
 		
-		return studenteMailService.sendEmail(studente.getMail(), resetToken, tipoUser);
+		return mailService.sendEmail(studente.getMail(), resetToken, tipoUser);
 	}
-
-	//SERVE PER L'UPDATE DELLA PASSWORD
 	public String updatePassword(String password, String token) {
 		Token newToken = tokenRepository.findByIdAndDate(token, LocalDate.now())
 				.orElseThrow(() -> new NotFoundTokenException("Token non trovato o scaduto"));
@@ -162,23 +156,8 @@ public class StudentService {
 		tokenRepository.delete(newToken);
 		return "Password aggiornata";
 	}
-	//SERVE PER OTTENERE IL TOKEN
-	public String getToken(String userCode) {
-		LocalDate date_now = LocalDate.now();
-		Studente studente = studentRepository.findStudentByUserCode(userCode)
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		
-		for(Token token : studente.getTokens()) {
-			if(token.getExpiredDate().isAfter(date_now)) {
-				return token.getToken();
-			}
-			if(token.getExpiredDate().equals(date_now)) {
-				return token.getToken();
-			}
-		}
-		throw new NotFoundTokenException("Token scaduto");
-	}
 	
+	/* update studente tramite dati anagrafici */
 	public String updateStudent(StudenteDto studenteDto) {
 		Studente studente = conversioneStudenteDto_Studente(studenteDto);
 		
@@ -190,6 +169,7 @@ public class StudentService {
 		return "Studente non aggiornato! Riprovare";
 	}
 	
+	/* get registro delle materie e voti */
 	public RegistroFamiglia getVoti(String email) {
 		Studente studente = studentRepository.findStudentByMail(email)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
@@ -209,12 +189,14 @@ public class StudentService {
 		
 		return registroFamiglia;
 	}
+	
+	/* metodi utilizzati da java */
 	private List<ValutazioneDto> getList(List<ValutazioneDto> val, ValutazioneDto voto){
 		val.add(voto);
 		return val;
 	}
 	
-	static StudenteDto conversioneStudente_StudenteDto(Studente studente) {
+	private StudenteDto conversioneStudente_StudenteDto(Studente studente) {
 		StudenteDto studenteDto = new StudenteDto();
 		
 		studenteDto.setNome(studente.getNome());

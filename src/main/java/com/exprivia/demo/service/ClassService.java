@@ -69,9 +69,12 @@ public class ClassService {
 		for (Studente studente : studenti) {
 			StudenteDto studenteDto = new StudenteDto();
 
-			studenteDto = StudentService.conversioneStudente_StudenteDto(studente);
-			studenteDto.setUserCode(null);
+			studenteDto.setNome(studente.getNome());
+			studenteDto.setCognome(studente.getCognome());
+			studenteDto.setMail(studente.getMail());
 			studenteDto.setPassword(null);
+			studenteDto.setUserCode(null);
+			studenteDto.setSezione(studente.getClasse().getSezione());
 
 			studentiDto.add(studenteDto);
 		}

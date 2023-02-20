@@ -13,11 +13,11 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 @Service
-public class SendMailStudenteService {
+public class SendMailService {
 	private final JavaMailSender javaMailSender;
 	
 	@Autowired
-	public SendMailStudenteService(JavaMailSender javaMailSender) {
+	public SendMailService(JavaMailSender javaMailSender) {
 		this.javaMailSender = javaMailSender;
 	}
 	

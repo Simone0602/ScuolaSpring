@@ -27,7 +27,6 @@ public class ClassController {
 		this.service = service;
 	}
 	
-	@CrossOrigin
 	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<ClasseDto>> getAllClassi() {
 		List<ClasseDto> classi = service.findAllClassi();
