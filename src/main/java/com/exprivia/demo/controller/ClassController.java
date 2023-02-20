@@ -27,18 +27,21 @@ public class ClassController {
 		this.service = service;
 	}
 	
+	//TROVA TUTTE LE CLASSI
 	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<ClasseDto>> getAllClassi() {
 		List<ClasseDto> classi = service.findAllClassi();
 		return new ResponseEntity<>(classi, HttpStatus.OK);
 	}
 	
+	//AGGIORNA LE CLASSI
 	@PutMapping(path = "/update")
 	public ResponseEntity<ClasseDto> updateClasse(@RequestBody ClasseDto classeDto) {
 		ClasseDto classe = service.updateClasse(classeDto);
 		return new ResponseEntity<>(classe, HttpStatus.CREATED);
 	}
 	
+	//TROVA GLI STUDENTI DI UNA DETERMINATA CLASSE
 	@GetMapping(path = "/{sezione}/studenti")
 	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione(@PathVariable("sezione") String sezione) {
 		List<StudenteDto> studenti = service.findAllStudentBySezione(sezione);

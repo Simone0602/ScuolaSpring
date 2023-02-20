@@ -31,7 +31,7 @@ public class DocenteController {
 		this.service = service;
 	}
 
-	// SERVE ALLO STUDENTE DI VEDERE TUTTI GLI INSEGNANTI
+	// SERVE ALLO STUDENTE PER VEDERE TUTTI GLI INSEGNANTI
 	@GetMapping(path = "/findAll")
 	public ResponseEntity<List<DocenteDto>> getAllDocenti() {
 		List<DocenteDto> docenti = service.findAllDocenti();
@@ -66,6 +66,7 @@ public class DocenteController {
 	}
 
 	// SERVE ALLA SEGRETERIA
+	// AGGIORNAMENTO DATI DOCENTE
 	@PutMapping(path = "/update")
 	public ResponseEntity<DocenteDto> updateDocente(@RequestBody DocenteDto docenteDto) {
 		DocenteDto docente = service.updateDocente(docenteDto);
@@ -73,6 +74,7 @@ public class DocenteController {
 	}
 
 	// SERVE ALLA SEGRETERIA
+	// ELIMINA DATI DOCENTE
 	@DeleteMapping(path = "/delete/{codiceFiscale}")
 	public ResponseEntity<String> deleteDocente(@PathVariable("codiceFiscale") String codiceFiscale) {
 		String messaggio = service.deleteDocente(codiceFiscale);
