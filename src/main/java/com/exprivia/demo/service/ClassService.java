@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.ClassRepository;
@@ -67,8 +68,10 @@ public class ClassService {
 	//TROVA TUTTI GLI STUDENTI DI UNA DETERMINATA CLASSE
 	public List<StudenteDto> findAllStudentBySezione(String sezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
-		List<Studente> studenti = repository.findBySezione(sezione).get().getStudenti();
-
+		Classe classe = repository.findBySezione(sezione)
+				.orElseThrow(() -> new NotFoundClasseException("Classe non trovata"));
+		List<Studente> studenti = classe.getStudenti();
+		
 		for (Studente studente : studenti) {
 			StudenteDto studenteDto = new StudenteDto();
 

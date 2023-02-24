@@ -1,5 +1,6 @@
 package com.exprivia.demo.model;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -13,12 +14,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "studenti")
-public class Studente {
+public class Studente implements UserDetails{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
@@ -33,7 +37,7 @@ public class Studente {
 	@Column(name = "email")
 	private String mail;
 	@Column(name = "password")
-	private String password;
+	private String pass;
 	@Column(name = "user_code", length = 6)
 	private String userCode;
 
@@ -53,11 +57,11 @@ public class Studente {
 	public Studente() {
 	}
 
-	public Studente(String nome, String cognome, String mail, String password, String userCode, Classe classe) {
+	public Studente(String nome, String cognome, String mail, String pass, String userCode, Classe classe) {
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
-		this.password = password;
+		this.pass = pass;
 		this.userCode = userCode;
 		this.classe = classe;
 	}
@@ -117,13 +121,13 @@ public class Studente {
 	public void setMail(String mail) {
 		this.mail = mail;
 	}
-
-	public String getPassword() {
-		return password;
+	
+	public String getPass() {
+		return pass;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPass(String pass) {
+		this.pass = pass;
 	}
 
 	public String getUserCode() {
@@ -137,7 +141,42 @@ public class Studente {
 	@Override
 	public String toString() {
 		return "Studente [getId()=" + getId() + ", getNome()=" + getNome() + ", getCognome()=" + getCognome()
-				+ ", getMail()=" + getMail() + ", getpassword()=" + getPassword() + ", getUser()=" + getUserCode() + "]";
+				+ ", getMail()=" + getMail() + ", getpassword()=" + getPass() + ", getUser()=" + getUserCode() + "]";
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.userCode;
+	}
+	
+	@Override
+	public String getPassword() {
+		return this.pass;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 }

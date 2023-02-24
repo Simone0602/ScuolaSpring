@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.RegistroFamiglia;
@@ -16,7 +17,6 @@ import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.dto.ValutazioneDto;
 import com.exprivia.demo.enums.Materie;
 import com.exprivia.demo.exception.IllegalMailException;
-import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.exception.NotFoundTokenException;
@@ -35,16 +35,19 @@ public class StudentService {
 	private final StudentRepo studentRepository;
 	private final ClassRepository classRepository;
 	private final TokenRepository tokenRepository;
+	private final PasswordEncoder passwordEncoder;
 	private final SendMailService mailService;
 
 	@Autowired
 	public StudentService(StudentRepo studentRepository, 
 			ClassRepository classRepository, 
 			TokenRepository tokenRepository, 
+			PasswordEncoder passwordEncoder,
 			SendMailService mailService) {
 		this.studentRepository = studentRepository;
 		this.classRepository = classRepository;
 		this.tokenRepository = tokenRepository;
+		this.passwordEncoder = passwordEncoder;
 		this.mailService = mailService;
 	}
 
@@ -59,40 +62,12 @@ public class StudentService {
 
 		return studenteDto;
 	}
-	
-	//ricerca studente dell'ultimo anno
-	public List<StudenteDto> findAllStudentBySezione5(String numeroSezione) {
-		List<StudenteDto> studentiDto = new ArrayList<>();
-		List<Studente> studenti = studentRepository.findAll();
-		
-		for(Studente studente : studenti) {
-			StudenteDto studenteDto = new StudenteDto();
-			
-			if(studente.getClasse().getSezione().contains(numeroSezione)) {
-				studenteDto = conversioneStudente_StudenteDto(studente);
-
-				studentiDto.add(studenteDto);
-			}
-		}
-		return studentiDto;
-	}
 
 	//aggiungere uno studente
 	public String addStudent(StudenteDto studenteDto) {
-		Studente studente = new Studente();
-		Classe classe = classRepository.findBySezione(studenteDto.getSezione())
-				.orElseThrow(() -> new NotFoundSezioneException("Sezione non trovata"));
-
 		if (!studentRepository.existsByUserCode(studenteDto.getUserCode())) {
 			if(!studentRepository.existsByMail(studenteDto.getMail())) {
-				studente.setNome(studenteDto.getNome());
-				studente.setCognome(studenteDto.getCognome());
-				studente.setUserCode(studenteDto.getUserCode());
-				studente.setMail(studenteDto.getMail());
-				studente.setPassword(studenteDto.getPassword());
-				studente.setClasse(classe);
-
-				studentRepository.save(studente);
+				studentRepository.save(conversioneStudenteDto_Studente(studenteDto));
 				return "Studente salvato";
 			}
 			return "Email già esistente";
@@ -112,20 +87,16 @@ public class StudentService {
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		if (studente != null) {
 			studentRepository.deleteById(studente.getId());
-			return "Utente eliminato";
+			return "Studente eliminato";
 		}
-		return "Utente non presente";
+		return "Studente non presente";
 	}
 	
-	/* login */
-	public StudenteDto login(StudenteDto studenteDto) {
+	/* get studente */
+	public StudenteDto getStudent(String userCode) {
 		StudenteDto studenteDtoLoggato = new StudenteDto();
-		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
+		Studente studente = studentRepository.findStudentByUserCode(userCode)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		
-		if(!studente.getPassword().equals(studenteDto.getPassword())) {
-			throw new IllegalPasswordException("Password errata");
-		}
 		
 		studenteDtoLoggato = conversioneStudente_StudenteDto(studente);
 
@@ -134,7 +105,7 @@ public class StudentService {
 	
 	/* Metodi utilizzo send mail e update password */
 	//reset della password
-	public String resetPassword(StudenteDto studenteDto, String tipoUser) throws UnsupportedEncodingException {
+	public String resetPassword(StudenteDto studenteDto) throws UnsupportedEncodingException {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		
@@ -148,7 +119,7 @@ public class StudentService {
 		Token token = new Token(resetToken, studente);
 		tokenRepository.save(token);
 		
-		return mailService.sendEmail(studente.getMail(), resetToken, tipoUser);
+		return mailService.sendEmail(studente.getMail(), resetToken, "studente");
 	}
 	//aggiornamento password
 	public String updatePassword(String password, String token) {
@@ -157,7 +128,7 @@ public class StudentService {
 		Studente studente = studentRepository.findById(newToken.getStudente().getId())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		
-		studente.setPassword(password);
+		studente.setPass(passwordEncoder.encode(password));
 		
 		studentRepository.save(studente);
 		tokenRepository.delete(newToken);
@@ -168,11 +139,10 @@ public class StudentService {
 	//aggiorna studente
 	public String updateStudent(StudenteDto studenteDto) {
 		Studente studente = conversioneStudenteDto_Studente(studenteDto);
+		studentRepository.save(studente);
 		
 		if(studentRepository.findById(studente.getId()).isPresent()) {
-			if(studente.getMail().equals(studenteDto.getMail()) && studente.getPassword().equals(studenteDto.getPassword())) {
-				return "Studente aggiornato";
-			}
+			return "Studente aggiornato";
 		}
 		return "Studente non aggiornato! Riprovare";
 	}
@@ -198,7 +168,6 @@ public class StudentService {
 		
 		return registroFamiglia;
 	}
-	
 	/* metodi utilizzati da java */
 	private List<ValutazioneDto> getList(List<ValutazioneDto> val, ValutazioneDto voto){
 		val.add(voto);
@@ -211,7 +180,7 @@ public class StudentService {
 		studenteDto.setNome(studente.getNome());
 		studenteDto.setCognome(studente.getCognome());
 		studenteDto.setMail(studente.getMail());
-		studenteDto.setPassword(studente.getPassword());
+		studenteDto.setPassword(studente.getPass());
 		studenteDto.setUserCode(studente.getUserCode());
 		studenteDto.setSezione(studente.getClasse().getSezione());
 		
@@ -227,12 +196,9 @@ public class StudentService {
 		studente.setNome(studenteDto.getNome());
 		studente.setCognome(studenteDto.getCognome());
 		studente.setMail(studenteDto.getMail());
-		studente.setPassword(studenteDto.getPassword());
+		studente.setPass(passwordEncoder.encode(studenteDto.getPassword()));
 		studente.setUserCode(studenteDto.getUserCode());
 		studente.setClasse(classe);
-
-		studentRepository.save(studente);
-
 		return studente;
 	}
 }

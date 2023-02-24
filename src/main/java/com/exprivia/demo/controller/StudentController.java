@@ -1,11 +1,9 @@
 package com.exprivia.demo.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,12 +22,12 @@ import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.exception.NotFoundTokenException;
 import com.exprivia.demo.service.StudentService;
+
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping(path = "studente")
 public class StudentController {
 
@@ -44,13 +42,6 @@ public class StudentController {
 	public ResponseEntity<StudenteDto> getStudentByMail(@PathVariable("mail") String mail) {
 		StudenteDto studente = service.findStudentByMail(mail);
 		return new ResponseEntity<>(studente, HttpStatus.OK);
-	}
-
-	// trovare tutti quelli dell'ultimo anno
-	@GetMapping(path = "/find-all-student")
-	public ResponseEntity<List<StudenteDto>> getAllStudentBySezione5() {
-		List<StudenteDto> studenti = service.findAllStudentBySezione5("5");
-		return new ResponseEntity<>(studenti, HttpStatus.OK);
 	}
 
 	//aggiungere uno studente
@@ -74,11 +65,13 @@ public class StudentController {
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
-	/* Login */
-	@PostMapping(path = "/login")
-	public ResponseEntity<Object> loginStudent(@RequestBody StudenteDto studenteDto) {
+	//METODI UTILIZZATI DALLO STUDENTE
+	
+	/* get studente */
+	@GetMapping(path = "/{userCode}/get-studente")
+	public ResponseEntity<Object> getStudent(@PathVariable("userCode") String userCode) {
 		try {
-			StudenteDto studente = service.login(studenteDto);
+			StudenteDto studente = service.getStudent(userCode);
 			return new ResponseEntity<>(studente, HttpStatus.OK);
 		} catch (NotFoundStudentException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -88,11 +81,10 @@ public class StudentController {
 	}
 
 	/* Metodi invio mail e update password */
-	@PostMapping(path = "/send-mail/{tipoUser}")
-	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto,
-			@PathVariable("tipoUser") String tipoUser) throws UnsupportedEncodingException {
+	@PostMapping(path = "/send-mail")
+	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto) throws UnsupportedEncodingException {
 		try {
-			String message = service.resetPassword(studenteDto, tipoUser);
+			String message = service.resetPassword(studenteDto);
 			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
 		} catch (NotFoundStudentException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -103,7 +95,7 @@ public class StudentController {
 		}
 	}
 
-	//cambio password
+	/* cambio password */
 	@PutMapping(path = "/update-password/{token}")
 	public ResponseEntity<String> updatePassword(@RequestBody String password, @PathVariable("token") String token) {
 		try {

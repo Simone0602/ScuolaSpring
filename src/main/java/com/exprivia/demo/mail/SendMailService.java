@@ -28,7 +28,7 @@ public class SendMailService {
 		try {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
 			if(helper != null) {
-				helper.setFrom("ProgettoExprivia@gmail.com", "ScuolaXX");
+				helper.setFrom("prova.scuola.spring@gmail.com", "ScuolaXX");
 				helper.setTo(email);
 				helper.setSubject("Reset password");
 				helper.setText(generateTextMailRecoverPass(token, tipoUser), true);

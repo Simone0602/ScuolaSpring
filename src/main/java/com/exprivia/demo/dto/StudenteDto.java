@@ -2,6 +2,7 @@ package com.exprivia.demo.dto;
 
 public class StudenteDto {
 
+	private long id;
 	private String nome;
 	private String cognome;
 	private String mail;
@@ -12,14 +13,23 @@ public class StudenteDto {
 	public StudenteDto() {
 	}
 
-	public StudenteDto(String nome, String cognome, String mail, String password, String userCode, String sezione) {
+	public StudenteDto(Long id, String nome, String cognome, String mail, String password, String userCode, String sezione) {
 		super();
+		this.id = id;
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.password = password;
 		this.userCode = userCode;
 		this.sezione = sezione;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public String getSezione() {
