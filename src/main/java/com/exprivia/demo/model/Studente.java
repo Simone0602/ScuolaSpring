@@ -53,6 +53,10 @@ public class Studente implements UserDetails{
 	@OneToMany(mappedBy = "studente")
 	@JsonManagedReference
 	private List<Valutazione> voti;
+	
+	@OneToMany(mappedBy = "studente")
+	@JsonManagedReference
+	private List<Assenza> assenze;
 
 	public Studente() {
 	}
@@ -136,6 +140,15 @@ public class Studente implements UserDetails{
 
 	public void setUserCode(String user) {
 		this.userCode = user;
+	}
+	
+
+	public List<Assenza> getAssenze() {
+		return assenze;
+	}
+
+	public void setAssenze(List<Assenza> assenze) {
+		this.assenze = assenze;
 	}
 
 	@Override

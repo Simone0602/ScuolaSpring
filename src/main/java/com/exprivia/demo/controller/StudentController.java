@@ -1,6 +1,7 @@
 package com.exprivia.demo.controller;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exprivia.demo.dto.AssenzaDto;
 import com.exprivia.demo.dto.RegistroFamiglia;
 import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.exception.DontSendEmailException;
+import com.exprivia.demo.exception.IllegalDatiException;
 import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
 import com.exprivia.demo.exception.NotFoundClasseException;
@@ -120,7 +123,7 @@ public class StudentController {
 	}
 
 	/* update studente tramite dati anagrici */
-	@PutMapping(path = "update")
+	@PutMapping(path = "/update")
 	public ResponseEntity<String> updateStudente(@RequestBody StudenteDto studenteDto) {
 		try {
 			String message = service.updateStudent(studenteDto);
@@ -128,6 +131,32 @@ public class StudentController {
 		} catch (NotFoundStudentException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		} catch (NotFoundClasseException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (IllegalDatiException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+	
+	/* get assenze */
+	@GetMapping(path = "/{userCode}/get-assenze")
+	public ResponseEntity<Object> getAssenze(@PathVariable("userCode") String userCode){
+		try {
+			List<AssenzaDto> assenze = service.getAssenze(userCode);
+			return new ResponseEntity<>(assenze, HttpStatus.OK);
+		} catch (NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	/* giustifica assenze */
+	@PutMapping(path = "/{userCode}/giustifica-assenze")
+	public ResponseEntity<String> giustificaAssenze(
+			@RequestBody List<AssenzaDto> assenzaDto, 
+			@PathVariable("userCode") String userCode){
+		try {
+			String message = service.giustificaAssenze(assenzaDto, userCode);
+			return new ResponseEntity<>(message, HttpStatus.OK);
+		} catch (NotFoundStudentException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
