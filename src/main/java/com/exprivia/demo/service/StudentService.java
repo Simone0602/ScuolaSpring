@@ -2,8 +2,6 @@ package com.exprivia.demo.service;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +15,6 @@ import com.exprivia.demo.dto.AssenzaDto;
 import com.exprivia.demo.dto.RegistroFamiglia;
 import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.dto.ValutazioneDto;
-import com.exprivia.demo.enums.Materie;
 import com.exprivia.demo.exception.IllegalDatiException;
 import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
@@ -28,7 +25,6 @@ import com.exprivia.demo.model.Assenza;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.model.Token;
-import com.exprivia.demo.model.Valutazione;
 import com.exprivia.demo.repository.AssenzaRepository;
 import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.StudentRepo;
@@ -57,49 +53,6 @@ public class StudentService {
 		this.assenzaRepository = assenzaRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.mailService = mailService;
-	}
-
-	/* Segreteria */
-	//ricerca di uno studente tremite mail
-	public StudenteDto findStudentByMail(String mail) {
-		StudenteDto studenteDto = new StudenteDto();
-		Studente studente = studentRepository.findStudentByMail(mail)
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-
-		studenteDto = conversioneStudente_StudenteDto(studente);
-
-		return studenteDto;
-	}
-
-	//aggiungere uno studente
-	public String addStudent(StudenteDto studenteDto) {
-		if (!studentRepository.existsByUserCode(studenteDto.getUserCode())) {
-			if(!studentRepository.existsByMail(studenteDto.getMail())) {
-				studentRepository.save(conversioneStudenteDto_Studente(studenteDto));
-				return "Studente salvato";
-			}
-			return "Email già esistente";
-		}
-		return "Studente già presente";
-	}
-	
-	//aggiornamento dati studente
-	public StudenteDto updateStudentBySegreteria(StudenteDto studenteDto) {
-		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		studenteDto.setId(studente.getId());
-		return conversioneStudente_StudenteDto(conversioneStudenteDto_Studente(studenteDto));
-	}
-	
-	//elimina studente 
-	public String deleteStudent(String userCode) {
-		Studente studente = studentRepository.findStudentByUserCode(userCode)
-				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		if (studente != null) {
-			studentRepository.deleteById(studente.getId());
-			return "Studente eliminato";
-		}
-		return "Studente non presente";
 	}
 	
 	/* get studente */
@@ -204,29 +157,19 @@ public class StudentService {
 	
 	/* get registro delle materie e voti */
 	//stampa i voti degli studenti
-	public RegistroFamiglia getVoti(String email) {
-		Studente studente = studentRepository.findStudentByMail(email)
+	public RegistroFamiglia getVoti(String userCode) {
+		Studente studente = studentRepository.findStudentByUserCode(userCode)
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		RegistroFamiglia registroFamiglia = new RegistroFamiglia();
 		
-		HashMap<Materie, List<ValutazioneDto>> voti = new HashMap<>();
-		Iterator<Valutazione> iter = studente.getVoti().iterator();
-		while(iter.hasNext()) {
-			Valutazione voto = iter.next();
-			ValutazioneDto votoDto = new ValutazioneDto(voto.getVoto(), voto.getData());
-			
-			voti.computeIfPresent(voto.getMateria().getMateria(), (key, val) -> getList(val, votoDto));
-			voti.computeIfAbsent(voto.getMateria().getMateria(), k -> new ArrayList<ValutazioneDto>() {{ add(votoDto); }});
-		}
+		List<ValutazioneDto> votiDto = studente.getVoti()
+				.stream()
+				.map(x -> new ValutazioneDto(x.getMateria().getMateria().name(), x.getVoto(), x.getData()))
+				.collect(Collectors.toList());
 		
-		registroFamiglia.setListaVoti_materie(voti);
+		registroFamiglia.setListaVoti(votiDto);
 		
 		return registroFamiglia;
-	}
-	/* metodi utilizzati da java */
-	private List<ValutazioneDto> getList(List<ValutazioneDto> val, ValutazioneDto voto){
-		val.add(voto);
-		return val;
 	}
 	
 	private StudenteDto conversioneStudente_StudenteDto(Studente studente) {

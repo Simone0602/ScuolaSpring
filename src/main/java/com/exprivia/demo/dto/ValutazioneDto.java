@@ -4,24 +4,26 @@ import java.time.LocalDate;
 
 public class ValutazioneDto {
 
-	private int voto;
+	private String materia;
+	private float voto;
 	private LocalDate data;
 
 	public ValutazioneDto() {
 		super();
 	}
 
-	public ValutazioneDto(int voto, LocalDate data) {
+	public ValutazioneDto(String materia, float voto, LocalDate data) {
 		super();
+		this.materia = materia;
 		this.voto = voto;
 		this.data = data;
 	}
 
-	public int getVoto() {
+	public float getVoto() {
 		return voto;
 	}
 
-	public void setVoto(int voto) {
+	public void setVoto(float voto) {
 		this.voto = voto;
 	}
 
@@ -31,6 +33,14 @@ public class ValutazioneDto {
 
 	public void setData(LocalDate data) {
 		this.data = data;
+	}
+
+	public String getMateria() {
+		return materia;
+	}
+
+	public void setMateria(String materia) {
+		this.materia = materia;
 	}
 
 }

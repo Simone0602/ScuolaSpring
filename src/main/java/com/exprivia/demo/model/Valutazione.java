@@ -20,7 +20,7 @@ public class Valutazione {
 	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
 	@Column(name = "valutazione_id")
 	private long id;
-	private int voto;
+	private float voto;
 	private LocalDate data;
 
 	@ManyToOne
@@ -34,7 +34,7 @@ public class Valutazione {
 	private Materia materia;
 
 	public Valutazione() {}
-	public Valutazione(long id, int voto, LocalDate data, Studente studente, Materia materia) {
+	public Valutazione(long id, float voto, LocalDate data, Studente studente, Materia materia) {
 		super();
 		this.id = id;
 		this.voto = voto;
@@ -51,11 +51,11 @@ public class Valutazione {
 		this.id = id;
 	}
 
-	public int getVoto() {
+	public float getVoto() {
 		return voto;
 	}
 
-	public void setVoto(int voto) {
+	public void setVoto(float voto) {
 		this.voto = voto;
 	}
 

@@ -3,7 +3,6 @@ package com.exprivia.demo.service;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,23 +52,14 @@ public class DocenteService {
 		return docenteRepository.findAll().stream().map(x -> conversioneDocente_DocenteDto(x))
 				.collect(Collectors.toList());
 	}
-
-	// SERVE ALLO STUDENTE
-	// TROVA UN DOCENTE TRAMITE CODICE FISCALE
-	public List<ClasseDto> findAllClassByDocente(String codiceFiscale) {
-		return docenteRepository.findDocenteByCodiceFiscale(codiceFiscale).get().getClassi().stream()
-				.map(x -> new ClasseDto(x.getId(), x.getSezione(), x.getCordinatore(), x.getAula()))
+	
+	public List<ClasseDto> findClassByDocente(String codiceFiscale){
+		return docenteRepository.findDocenteByCodiceFiscale(codiceFiscale)
+				.orElseThrow(() -> new NotFoundDocenteException("Docente non trovato"))
+				.getClassi()
+				.stream()
+				.map(x -> new ClasseDto(x.getSezione(), x.getCordinatore(), x.getAula()))
 				.collect(Collectors.toList());
-	}
-
-	// SERVE ALLA SEGRETERIA
-	// AGGIUNGE UN DOCENTE
-	public String addDocente(DocenteDto docenteDto) {
-		if (!docenteRepository.existsByCodiceFiscale(docenteDto.getCodiceFiscale())) {
-			docenteRepository.save(conversioneDocenteDto_Docente(docenteDto));
-			return "Docente salvato";
-		}
-		return "Docente già presente";
 	}
 
 	/* Get docente */
@@ -112,53 +102,7 @@ public class DocenteService {
 		tokenRepository.delete(newToken);
 		return "Password aggiornata";
 	}
-
-	// SERVE ALLA SEGRETERIA
-	// AGGIORNAMENTO DATI DOCENTE
-	public DocenteDto updateDocente(DocenteDto docenteDto) {
-		DocenteDto newDocenteDto = new DocenteDto();
-		Docente docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
-				.orElseThrow(() -> new NotFoundDocenteException("Docente non esistente"));
-
-		docente = conversioneDocenteDto_Docente(docenteDto);
-		docente.setId(docente.getId());
-
-		docenteRepository.save(docente);
-
-		newDocenteDto.setNome(docente.getNome());
-		newDocenteDto.setCognome(docente.getCognome());
-		newDocenteDto.setMail(docente.getMail());
-		newDocenteDto.setPassword(docente.getPassword());
-		newDocenteDto.setMaterie(getStringMaterie(docente));
-		newDocenteDto.setCodiceFiscale(docente.getCodiceFiscale());
-
-		return newDocenteDto;
-	}
-
-	// ELIMINA DATI DOCENTE TRAMITE CODICE FISCALE
-	public String deleteDocente(String codiceFiscale) {
-		Optional<Docente> docente = docenteRepository.findDocenteByCodiceFiscale(codiceFiscale);
-		if (docente.isPresent()) {
-			docenteRepository.deleteById(docente.get().getId());
-			return "Docente eliminato";
-		}
-		return "Docente non presente";
-	}
-
-	// STAMPA LE MATERIE DI UN DOCENTE
-	private List<String> getStringMaterie(Docente docente) {
-		List<String> materie = docente.getMaterie().stream().map(x -> x.getMateria().name())
-				.collect(Collectors.toList());
-		return materie;
-	}
-
-	private Set<Materia> getSetMaterie(DocenteDto docenteDto) {
-		Set<Materia> materie = docenteDto.getMaterie().stream()
-				.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x))).filter(x -> x != null)
-				.collect(Collectors.toSet());
-		return materie;
-	}
-
+	
 	private DocenteDto conversioneDocente_DocenteDto(Docente docente) {
 		DocenteDto docenteDto = new DocenteDto();
 
@@ -181,5 +125,19 @@ public class DocenteService {
 		docente.setMaterie(getSetMaterie(docenteDto));
 		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
 		return docente;
+	}
+
+	// STAMPA LE MATERIE DI UN DOCENTE
+	private List<String> getStringMaterie(Docente docente) {
+		List<String> materie = docente.getMaterie().stream().map(x -> x.getMateria().name())
+				.collect(Collectors.toList());
+		return materie;
+	}
+
+	private Set<Materia> getSetMaterie(DocenteDto docenteDto) {
+		Set<Materia> materie = docenteDto.getMaterie().stream()
+				.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x))).filter(x -> x != null)
+				.collect(Collectors.toSet());
+		return materie;
 	}
 }

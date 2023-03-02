@@ -35,6 +35,7 @@ public class SecurityConfiguration{
 			.disable()
 			.authorizeRequests()
 			.antMatchers("/auth/**",
+					"/segreteria/**",
 					"/swagger-ui/**",
 					"/classe/find-all", 
 					"/docente/find-all",

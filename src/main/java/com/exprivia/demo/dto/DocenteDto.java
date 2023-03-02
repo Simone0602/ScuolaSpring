@@ -4,7 +4,6 @@ import java.util.List;
 
 public class DocenteDto {
 
-	private Long id;
 	private String nome;
 	private String cognome;
 	private String mail;
@@ -15,23 +14,14 @@ public class DocenteDto {
 	public DocenteDto() {
 	}
 
-	public DocenteDto(Long id, String nome, String cognome, String mail, String password, String materia, String codiceFiscale,
+	public DocenteDto(String nome, String cognome, String mail, String password, String materia, String codiceFiscale,
 			List<String> materie) {
-		this.id = id;
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.password = password;
 		this.materie = materie;
 		this.codiceFiscale = codiceFiscale;
-	}
-	
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getNome() {

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,19 +42,15 @@ public class DocenteController {
 		List<DocenteDto> docenti = service.findAllDocenti();
 		return new ResponseEntity<>(docenti, HttpStatus.OK);
 	}
-
-	// SERVE ALLO STUDENTE PER VEDERE UN DETERMINATO INSEGNANTE
+	
 	@GetMapping(path = "/find/{codiceFiscale}")
-	public ResponseEntity<List<ClasseDto>> getAllClassByDocente(@PathVariable("codiceFiscale") String codiceFiscale) {
-		List<ClasseDto> classi = service.findAllClassByDocente(codiceFiscale);
-		return new ResponseEntity<>(classi, HttpStatus.OK);
-	}
-
-	// SERVE ALLA SEGRETERIA
-	@PostMapping(path = "/add")
-	public ResponseEntity<String> addDocente(@RequestBody DocenteDto docenteDto) {
-		String messaggio = service.addDocente(docenteDto);
-		return new ResponseEntity<>(messaggio, HttpStatus.CREATED);
+	public ResponseEntity<Object> findClassiByDocente(@PathVariable("codiceFiscale") String codiceFiscale) {
+		try {
+			List<ClasseDto> classi = service.findClassByDocente(codiceFiscale);
+			return new ResponseEntity<>(classi, HttpStatus.OK);
+		} catch (NotFoundDocenteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
 	}
 
 	/* get docente */
@@ -109,21 +104,4 @@ public class DocenteController {
 
 		return new ResponseEntity<String>("Invio messaggio riuscito", HttpStatus.OK);
 	}
-
-	// SERVE ALLA SEGRETERIA
-	// AGGIORNAMENTO DATI DOCENTE
-	@PutMapping(path = "/update")
-	public ResponseEntity<DocenteDto> updateDocente(@RequestBody DocenteDto docenteDto) {
-		DocenteDto docente = service.updateDocente(docenteDto);
-		return new ResponseEntity<>(docente, HttpStatus.CREATED);
-	}
-
-	// SERVE ALLA SEGRETERIA
-	// ELIMINA DATI DOCENTE
-	@DeleteMapping(path = "/delete/{codiceFiscale}")
-	public ResponseEntity<String> deleteDocente(@PathVariable("codiceFiscale") String codiceFiscale) {
-		String messaggio = service.deleteDocente(codiceFiscale);
-		return new ResponseEntity<>(messaggio, HttpStatus.OK);
-	}
-
 }
