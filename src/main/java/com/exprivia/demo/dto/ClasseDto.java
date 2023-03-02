@@ -1,7 +1,6 @@
 package com.exprivia.demo.dto;
 
 public class ClasseDto {
-	private Long id;
 	private String sezione;
 	private String cordinatore;
 	private String aula;
@@ -9,19 +8,10 @@ public class ClasseDto {
 	public ClasseDto() {
 	}
 
-	public ClasseDto(Long id, String sezione, String cordinatore, String aula) {
-		this.id = id;
+	public ClasseDto(String sezione, String cordinatore, String aula) {
 		this.sezione = sezione;
 		this.cordinatore = cordinatore;
 		this.aula = aula;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getSezione() {
@@ -46,11 +36,5 @@ public class ClasseDto {
 
 	public void setAula(String aula) {
 		this.aula = aula;
-	}
-
-	@Override
-	public String toString() {
-		return "Classe [getId()=" + getId() + ", getSezione()=" + getSezione() + ", getCordinatore()="
-				+ getCordinatore() + ", getAula()=" + getAula() + "]";
 	}
 }

@@ -14,33 +14,31 @@ import javax.persistence.SequenceGenerator;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-public class Valutazione {
+public class Assenza {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
 	@SequenceGenerator(name = "DROIT_SEQ", sequenceName = "DROIT_ACCEES_SEQ", allocationSize = 1, initialValue = 1)
-	@Column(name = "valutazione_id")
+	@Column(name = "assenze_id")
 	private long id;
-	private float voto;
-	private LocalDate data;
-
-	@ManyToOne
+	
+	@Column(name = "giornata_assenza")
+	private LocalDate giornataAssenza;
+	@Column(name = "giustificata")
+	private boolean isGiustificata;
+	
+	@ManyToOne()
 	@JoinColumn(name = "student_id")
 	@JsonBackReference
 	private Studente studente;
 	
-	@ManyToOne
-	@JoinColumn(name = "materia_id")
-	@JsonBackReference
-	private Materia materia;
+	public Assenza() {};
 
-	public Valutazione() {}
-	public Valutazione(long id, float voto, LocalDate data, Studente studente, Materia materia) {
+	public Assenza(long id, LocalDate giornataAssenza, Studente studente) {
 		super();
 		this.id = id;
-		this.voto = voto;
-		this.data = data;
+		this.giornataAssenza = giornataAssenza;
+		this.isGiustificata = false;
 		this.studente = studente;
-		this.materia = materia;
 	}
 
 	public long getId() {
@@ -51,20 +49,20 @@ public class Valutazione {
 		this.id = id;
 	}
 
-	public float getVoto() {
-		return voto;
+	public LocalDate getGiornataAssenza() {
+		return giornataAssenza;
 	}
 
-	public void setVoto(float voto) {
-		this.voto = voto;
+	public void setGiornataAssenza(LocalDate giornataAssenza) {
+		this.giornataAssenza = giornataAssenza;
 	}
 
-	public LocalDate getData() {
-		return data;
+	public boolean isGiustificata() {
+		return isGiustificata;
 	}
 
-	public void setData(LocalDate data) {
-		this.data = data;
+	public void setGiustificata(boolean isGiustificata) {
+		this.isGiustificata = isGiustificata;
 	}
 
 	public Studente getStudente() {
@@ -73,13 +71,5 @@ public class Valutazione {
 
 	public void setStudente(Studente studente) {
 		this.studente = studente;
-	}
-
-	public Materia getMateria() {
-		return materia;
-	}
-
-	public void setMateria(Materia materia) {
-		this.materia = materia;
 	}
 }

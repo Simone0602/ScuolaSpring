@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.ClassRepository;
@@ -39,36 +40,13 @@ public class ClassService {
 		return classiDto;
 	}
 	
-	//AGGIORNA LE CLASSI
-	public ClasseDto updateClasse(ClasseDto classeDto) {
-		ClasseDto newClasseDto = new ClasseDto();
-		Classe classe = repository.findClasseById(classeDto.getId())
-				.orElseThrow(() -> new RuntimeException("Classe non esistente"));
-		
-		classe.setId(classeDto.getId());
-		classe.setSezione(classeDto.getSezione());
-		classe.setCordinatore(classeDto.getCordinatore());
-		classe.setAula(classeDto.getAula());
-		
-		repository.save(classe);
-		
-		classe = repository.findClasseById(classeDto.getId())
-				.orElseThrow(() -> new RuntimeException("Classe non esistente"));
-		
-		newClasseDto.setId(classe.getId());
-		newClasseDto.setSezione(classe.getSezione());
-		newClasseDto.setCordinatore(classe.getCordinatore());
-		newClasseDto.setAula(classe.getAula());
-		
-		
-		return newClasseDto;
-	}
-	
 	//TROVA TUTTI GLI STUDENTI DI UNA DETERMINATA CLASSE
 	public List<StudenteDto> findAllStudentBySezione(String sezione) {
 		List<StudenteDto> studentiDto = new ArrayList<>();
-		List<Studente> studenti = repository.findBySezione(sezione).get().getStudenti();
-
+		Classe classe = repository.findBySezione(sezione)
+				.orElseThrow(() -> new NotFoundClasseException("Classe non trovata"));
+		List<Studente> studenti = classe.getStudenti();
+		
 		for (Studente studente : studenti) {
 			StudenteDto studenteDto = new StudenteDto();
 

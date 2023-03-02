@@ -1,170 +1,143 @@
 package com.exprivia.demo.service;
 
-import java.util.ArrayList;
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.enums.Materie;
-import com.exprivia.demo.exception.IllegalPasswordException;
+import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
-import com.exprivia.demo.model.Classe;
+import com.exprivia.demo.exception.NotFoundStudentException;
+import com.exprivia.demo.exception.NotFoundTokenException;
+import com.exprivia.demo.mail.SendMailService;
 import com.exprivia.demo.model.Docente;
 import com.exprivia.demo.model.Materia;
+import com.exprivia.demo.model.Token;
 import com.exprivia.demo.repository.DocenteRepo;
 import com.exprivia.demo.repository.MateriaRepository;
+import com.exprivia.demo.repository.TokenRepository;
 
 @Service
 public class DocenteService {
 
 	private final DocenteRepo docenteRepository;
 	private final MateriaRepository materiaRepository;
+	private final TokenRepository tokenRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final SendMailService mailService;
 
-	public DocenteService(DocenteRepo docenteRepository, MateriaRepository materiaRepository) {
+	public DocenteService(DocenteRepo docenteRepository, 
+			MateriaRepository materiaRepository,
+			TokenRepository tokenRepository, 
+			PasswordEncoder passwordEncoder,
+			SendMailService mailService) {
 		this.docenteRepository = docenteRepository;
 		this.materiaRepository = materiaRepository;
+		this.tokenRepository = tokenRepository;
+		this.passwordEncoder = passwordEncoder;
+		this.mailService = mailService;
 	}
 
 	// SERVE ALLO STUDENTE
 	// TROVA TUTTI I DOCENTI
 	public List<DocenteDto> findAllDocenti() {
-		List<Docente> docenti = docenteRepository.findAll();
-		List<DocenteDto> docentiDto = new ArrayList<>();
-
-		for (Docente docente : docenti) {
-			DocenteDto docenteDto = new DocenteDto();
-
-			docenteDto.setNome(docente.getNome());
-			docenteDto.setCognome(docente.getCognome());
-			docenteDto.setMail(null);
-			docenteDto.setPassword(null);
-			docenteDto.setMaterie(getMaterie(docente));
-			docenteDto.setCodiceFiscale(docente.getCodiceFiscale());
-
-			docentiDto.add(docenteDto);
-		}
-		return docentiDto;
+		return docenteRepository.findAll().stream().map(x -> conversioneDocente_DocenteDto(x))
+				.collect(Collectors.toList());
+	}
+	
+	public List<ClasseDto> findClassByDocente(String codiceFiscale){
+		return docenteRepository.findDocenteByCodiceFiscale(codiceFiscale)
+				.orElseThrow(() -> new NotFoundDocenteException("Docente non trovato"))
+				.getClassi()
+				.stream()
+				.map(x -> new ClasseDto(x.getSezione(), x.getCordinatore(), x.getAula()))
+				.collect(Collectors.toList());
 	}
 
-	// SERVE ALLO STUDENTE
-	// TROVA UN DOCENTE TRAMITE CODICE FISCALE
-	public List<ClasseDto> findAllClassByDocente(String codiceFiscale) {
-		List<ClasseDto> classiDto = new ArrayList<>();
-		List<Classe> classi = docenteRepository.findDocenteByCodiceFiscale(codiceFiscale).get().getClassi();
-
-		for (Classe classe : classi) {
-			ClasseDto classeDto = new ClasseDto();
-
-			classeDto.setAula(classe.getAula());
-			classeDto.setCordinatore(classe.getCordinatore());
-			classeDto.setSezione(classe.getSezione());
-
-			classiDto.add(classeDto);
-		}
-		return classiDto;
-	}
-
-	// SERVE ALLA SEGRETERIA
-	// AGGIUNGE UN DOCENTE
-	public String addDocente(DocenteDto docenteDto) {
-		Docente docente = new Docente();
-
-		if (!docenteRepository.existsByCodiceFiscale(docenteDto.getCodiceFiscale())) {
-			Set<Materia> materie = docenteDto.getMaterie().stream()
-					.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x))).filter(x -> x != null)
-					.collect(Collectors.toSet());
-
-			docente.setNome(docenteDto.getNome());
-			docente.setCognome(docenteDto.getCognome());
-			docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
-			docente.setMail(docenteDto.getMail());
-			docente.setPassword(docenteDto.getPassword());
-			docente.setMaterie(materie);
-
-			docenteRepository.save(docente);
-			return "Docente salvato";
-		}
-		return "Docente già presente";
-	}
-
-	// LOGIN DOCENTE
-	public DocenteDto login(DocenteDto docenteDto) {
-		DocenteDto docenteDtoLoggato = new DocenteDto();
-		Docente docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
+	/* Get docente */
+	public DocenteDto getDocente(String codiceFiscale) {
+		Docente docente = docenteRepository.findDocenteByCodiceFiscale(codiceFiscale)
 				.orElseThrow(() -> new NotFoundDocenteException("Docente non trovato"));
 
-		if (!docente.getPassword().equals(docenteDto.getPassword())) {
-			throw new IllegalPasswordException("Password errata");
+		return conversioneDocente_DocenteDto(docente);
+	}
+
+	/* Metodi utilizzo send mail e update password */
+	// reset della password
+	public String resetPassword(DocenteDto docenteDto) throws UnsupportedEncodingException {
+		Docente docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
+				.orElseThrow(() -> new NotFoundStudentException("Docente non trovato"));
+
+		if (!docente.getMail().equals(docenteDto.getMail())) {
+			throw new IllegalMailException("Email errata");
 		}
 
-		docenteDtoLoggato.setNome(docente.getNome());
-		docenteDtoLoggato.setCognome(docente.getCognome());
-		docenteDtoLoggato.setMail(docente.getMail());
-		docenteDtoLoggato.setPassword(docente.getPassword());
-		docenteDtoLoggato.setCodiceFiscale(docente.getCodiceFiscale());
-		docenteDtoLoggato.setMaterie(getMaterie(docente));
+		UUID uuid = UUID.randomUUID();
+		String resetToken = uuid.toString();
 
-		return docenteDtoLoggato;
+		Token token = new Token(resetToken, docente);
+		tokenRepository.save(token);
+
+		return mailService.sendEmail(docente.getMail(), resetToken, "docente");
 	}
 
-	// SERVE ALLA SEGRETERIA
-	// AGGIORNAMENTO DATI DOCENTE
-	public DocenteDto updateDocente(DocenteDto docenteDto) {
-		DocenteDto newDocenteDto = new DocenteDto();
-		Docente docente = setDocente_docenteDto(docenteDto);
+	// aggiornamento password
+	public String updatePassword(String password, String token) {
+		Token newToken = tokenRepository.findByIdAndDate(token, LocalDate.now())
+				.orElseThrow(() -> new NotFoundTokenException("Token non trovato o scaduto"));
+		Docente docente = docenteRepository.findById(newToken.getDocente().getId())
+				.orElseThrow(() -> new NotFoundStudentException("Docente non trovato"));
 
-		newDocenteDto.setNome(docente.getNome());
-		newDocenteDto.setCognome(docente.getCognome());
-		newDocenteDto.setMail(docente.getMail());
-		newDocenteDto.setPassword(null);
-		newDocenteDto.setMaterie(getMaterie(docente));
-		newDocenteDto.setCodiceFiscale(docente.getCodiceFiscale());
+		docente.setPass(passwordEncoder.encode(password));
 
-		return newDocenteDto;
+		docenteRepository.save(docente);
+		tokenRepository.delete(newToken);
+		return "Password aggiornata";
+	}
+	
+	private DocenteDto conversioneDocente_DocenteDto(Docente docente) {
+		DocenteDto docenteDto = new DocenteDto();
+
+		docenteDto.setNome(docente.getNome());
+		docenteDto.setCognome(docente.getCognome());
+		docenteDto.setMail(docente.getMail());
+		docenteDto.setPassword(docente.getPass());
+		docenteDto.setCodiceFiscale(docente.getCodiceFiscale());
+		docenteDto.setMaterie(getStringMaterie(docente));
+		return docenteDto;
 	}
 
-	// METODO USATO NELL'UPDATE
-	public Docente setDocente_docenteDto(DocenteDto docenteDto) {
-		Docente docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
-				.orElseThrow(() -> new NotFoundDocenteException("Docente non esistente"));
+	private Docente conversioneDocenteDto_Docente(DocenteDto docenteDto) {
+		Docente docente = new Docente();
 
-		Set<Materia> materie = docenteDto.getMaterie().stream()
-				.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x))).filter(x -> x != null)
-				.collect(Collectors.toSet());
-
-		docente.setId(docente.getId());
 		docente.setNome(docenteDto.getNome());
 		docente.setCognome(docenteDto.getCognome());
 		docente.setMail(docenteDto.getMail());
-		docente.setPassword(docenteDto.getPassword());
-		docente.setMaterie(materie);
+		docente.setPass(docenteDto.getPassword());
+		docente.setMaterie(getSetMaterie(docenteDto));
 		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
-
-		docenteRepository.save(docente);
-
-		return docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
-				.orElseThrow(() -> new NotFoundDocenteException("Docente non esistente"));
-	}
-	
-	// ELIMINA DATI DOCENTE TRAMITE CODICE FISCALE
-	public String deleteDocente(String codiceFiscale) {
-		Optional<Docente> docente = docenteRepository.findDocenteByCodiceFiscale(codiceFiscale);
-		if (docente.isPresent()) {
-			docenteRepository.deleteById(docente.get().getId());
-			return "Docente eliminato";
-		}
-		return "Docente non presente";
+		return docente;
 	}
 
 	// STAMPA LE MATERIE DI UN DOCENTE
-	private List<String> getMaterie(Docente docente) {
+	private List<String> getStringMaterie(Docente docente) {
 		List<String> materie = docente.getMaterie().stream().map(x -> x.getMateria().name())
 				.collect(Collectors.toList());
+		return materie;
+	}
+
+	private Set<Materia> getSetMaterie(DocenteDto docenteDto) {
+		Set<Materia> materie = docenteDto.getMaterie().stream()
+				.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x))).filter(x -> x != null)
+				.collect(Collectors.toSet());
 		return materie;
 	}
 }

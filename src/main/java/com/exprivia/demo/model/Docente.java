@@ -1,5 +1,6 @@
 package com.exprivia.demo.model;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -13,14 +14,18 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "docenti")
-public class Docente {
+public class Docente implements UserDetails{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DROIT_SEQ")
@@ -35,7 +40,7 @@ public class Docente {
 	@Column(name = "email")
 	private String mail;
 	@Column(name = "password")
-	private String password;
+	private String pass;
 	@Column(name = "codice_fiscale", length = 16)
 	private String codiceFiscale;
 	
@@ -62,18 +67,22 @@ public class Docente {
 			)
 	@JsonManagedReference
 	private Set<Materia> materie;
+	
+	@OneToMany(mappedBy = "docente")
+	@JsonManagedReference
+	private List<Token> tokens;
 
 	public Docente() {
 	}
 
-	public Docente(long id, String nome, String cognome, String mail, String password, String codiceFiscale,
+	public Docente(long id, String nome, String cognome, String mail, String pass, String codiceFiscale,
 			List<Classe> classi, Set<Materia> materie) {
 		super();
 		this.id = id;
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
-		this.password = password;
+		this.pass = pass;
 		this.codiceFiscale = codiceFiscale;
 		this.classi = classi;
 		this.materie = materie;
@@ -119,12 +128,12 @@ public class Docente {
 		this.mail = mail;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getPass() {
+		return pass;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPass(String pass) {
+		this.pass = pass;
 	}
 
 	public String getCodiceFiscale() {
@@ -141,5 +150,48 @@ public class Docente {
 
 	public void setMaterie(Set<Materia> materie) {
 		this.materie = materie;
+	}
+
+	public List<Token> getTokens() {
+		return tokens;
+	}
+
+	public void setTokens(List<Token> tokens) {
+		this.tokens = tokens;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
+
+	@Override
+	public String getPassword() {
+		return this.pass;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.codiceFiscale;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }

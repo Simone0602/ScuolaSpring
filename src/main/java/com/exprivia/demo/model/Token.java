@@ -22,12 +22,22 @@ public class Token {
 	@JoinColumn(name = "studente_id")
 	@JsonBackReference
 	private Studente studente;
+	
+	@ManyToOne
+	@JoinColumn(name = "docente_id")
+	@JsonBackReference
+	private Docente docente;
 
 	public Token() {}
 	public Token(String token, Studente studente) {
 		this.token = token;
 		this.expiredDate = LocalDate.now().plusDays(7);
 		this.studente = studente;
+	}
+	public Token(String token, Docente docente) {
+		this.token = token;
+		this.expiredDate = LocalDate.now().plusDays(7);
+		this.docente = docente;
 	}
 	public String getToken() {
 		return token;
@@ -46,6 +56,12 @@ public class Token {
 	}
 	public void setStudente(Studente studente) {
 		this.studente = studente;
+	}
+	public Docente getDocente() {
+		return docente;
+	}
+	public void setDocente(Docente docente) {
+		this.docente = docente;
 	}
 	@Override
 	public String toString() {
