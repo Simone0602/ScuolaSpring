@@ -106,13 +106,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		
-		<!-- Mapper -->
-		<dependency>
-		    <groupId>org.mapstruct</groupId>
-		    <artifactId>mapstruct</artifactId>
-		    <version>1.5.3.Final</version>
-		</dependency>
 				
 		<!-- test spring boot -->
 		<dependency>
