@@ -4,24 +4,37 @@ import java.util.List;
 
 public class DocenteDto {
 
+	private Long id;
 	private String nome;
 	private String cognome;
 	private String mail;
 	private String password;
 	private List<String> materie;
 	private String codiceFiscale;
+	private List<String> sezioni;
 
 	public DocenteDto() {
 	}
 
-	public DocenteDto(String nome, String cognome, String mail, String password, String materia, String codiceFiscale,
-			List<String> materie) {
+	public DocenteDto(Long id, String nome, String cognome, String mail, String password, List<String> materie,
+			String codiceFiscale, List<String> sezioni) {
+		super();
+		this.id = id;
 		this.nome = nome;
 		this.cognome = cognome;
 		this.mail = mail;
 		this.password = password;
 		this.materie = materie;
 		this.codiceFiscale = codiceFiscale;
+		this.sezioni = sezioni;
+	}
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getNome() {
@@ -70,6 +83,14 @@ public class DocenteDto {
 
 	public void setCodiceFiscale(String codiceFiscale) {
 		this.codiceFiscale = codiceFiscale;
+	}
+
+	public List<String> getSezioni() {
+		return sezioni;
+	}
+
+	public void setSezioni(List<String> sezioni) {
+		this.sezioni = sezioni;
 	}
 
 }

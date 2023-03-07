@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.exprivia.demo.dto.AssenzaDto;
 import com.exprivia.demo.dto.RegistroFamiglia;
 import com.exprivia.demo.dto.StudenteDto;
-import com.exprivia.demo.exception.DontSendEmailException;
 import com.exprivia.demo.exception.IllegalDatiException;
 import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
@@ -54,7 +53,7 @@ public class StudentController {
 
 	/* Metodi invio mail e update password */
 	@PostMapping(path = "/send-mail")
-	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto) throws UnsupportedEncodingException {
+	public ResponseEntity<String> resetPassword(@RequestBody StudenteDto studenteDto) {
 		try {
 			String message = service.resetPassword(studenteDto);
 			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
@@ -62,7 +61,7 @@ public class StudentController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		} catch (IllegalMailException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-		} catch (DontSendEmailException e) {
+		} catch (UnsupportedEncodingException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
 	}

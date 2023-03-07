@@ -104,17 +104,16 @@ public class StudentService {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
 		
-		if(studenteDto.getPassword().equals("****************")){
-			studenteDto.setPassword(studente.getPass());
-		}
-		
 		if(studente.getPass().equals(studenteDto.getPassword()) && studente.getMail().equals(studenteDto.getMail())) {
 			throw new IllegalDatiException("I dati sono uguali a quelli già presenti.");
 		}
 		
 		studenteDto.setId(studente.getId());
 		Studente newStudente = conversioneStudenteDto_Studente(studenteDto);
-		newStudente.setPass(studente.getPass());
+		
+		if(studenteDto.getPassword().equals("****************")){
+			newStudente.setPass(studente.getPass());
+		}
 		studentRepository.save(newStudente);
 		
 		return "Studente aggiornato";

@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.exception.DontSendEmailException;
+import com.exprivia.demo.exception.IllegalDatiException;
 import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.IllegalPasswordException;
+import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.exception.NotFoundTokenException;
@@ -63,6 +65,21 @@ public class DocenteController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		} catch (IllegalPasswordException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+		}
+	}
+	
+	/* update docente tramite dati anagrafici */
+	@PutMapping(path = "/update")
+	public ResponseEntity<String> updateDocente(@RequestBody DocenteDto docenteDto) {
+		try {
+			String message = service.updateDocente(docenteDto);
+			return new ResponseEntity<>(message, HttpStatus.CREATED);
+		} catch (NotFoundDocenteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (NotFoundClasseException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (IllegalDatiException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
 	}
 	

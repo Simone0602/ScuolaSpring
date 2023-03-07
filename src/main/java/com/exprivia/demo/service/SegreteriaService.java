@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +11,7 @@ import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.dto.MateriaDto;
 import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.enums.Materie;
+import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
@@ -19,26 +19,37 @@ import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Docente;
 import com.exprivia.demo.model.Materia;
 import com.exprivia.demo.model.Studente;
+import com.exprivia.demo.repository.AssenzaRepository;
 import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.DocenteRepo;
 import com.exprivia.demo.repository.MateriaRepository;
 import com.exprivia.demo.repository.StudentRepo;
+import com.exprivia.demo.repository.TokenRepository;
+import com.exprivia.demo.repository.ValutazioneRepository;
 
 @Service
 public class SegreteriaService {
-
 	private final StudentRepo studentRepository;
+	private final TokenRepository tokenRepository;
+	private final ValutazioneRepository valutazioneRepository;
+	private final AssenzaRepository assenzaRepository;
 	private final DocenteRepo docenteRepository;
 	private final ClassRepository classRepository;
 	private final MateriaRepository materiaRepository;
 	private final PasswordEncoder passwordEncoder;
 	
 	public SegreteriaService(StudentRepo studentRepository, 
+			TokenRepository tokenRepository,
+			ValutazioneRepository valutazioneRepository,
+			AssenzaRepository assenzaRepository,
 			DocenteRepo docenteRepository, 
 			ClassRepository classRepository,
 			MateriaRepository materiaRepository,
 			PasswordEncoder passwordEncoder) {
 		this.studentRepository = studentRepository;
+		this.tokenRepository = tokenRepository;
+		this.valutazioneRepository = valutazioneRepository;
+		this.assenzaRepository = assenzaRepository;
 		this.docenteRepository = docenteRepository;
 		this.classRepository = classRepository;
 		this.materiaRepository = materiaRepository;
@@ -93,17 +104,23 @@ public class SegreteriaService {
 		if(studente.isEmpty()) {
 			throw new NotFoundStudentException("Studente non presente nel database");
 		}else {
+			tokenRepository.deleteTokenByStudenteId(studente.get().getId());
+			valutazioneRepository.deleteValutazioneByStudenteId(studente.get().getId());
+			assenzaRepository.deleteAssenzeByStudenteId(studente.get().getId());
 			studentRepository.deleteById(studente.get().getId());
 			return "Studente eliminato";
 		}
 	}
-	
+
 	public String deleteDocente(String codiceFsicale) {
 		Optional<Docente> docente = docenteRepository.findDocenteByCodiceFiscale(codiceFsicale);
 		if(docente.isEmpty()) {
 			throw new NotFoundStudentException("Studente non presente nel database");
-		}else {
-			studentRepository.deleteById(docente.get().getId());
+		} else {
+			docenteRepository.deleteMateriaByDocenteId(docente.get().getId());
+			docenteRepository.deleteClasseByDocenteId(docente.get().getId());
+			tokenRepository.deleteTokenByDocenteId(docente.get().getId());
+			docenteRepository.deleteById(docente.get().getId());
 			return "Docente eliminato";
 		}
 	}
@@ -153,10 +170,21 @@ public class SegreteriaService {
 		docente.setNome(docenteDto.getNome());
 		docente.setCognome(docenteDto.getCognome());
 		docente.setMail(docenteDto.getMail());
-		docente.setPass(docenteDto.getPassword());
+		docente.setPass(passwordEncoder.encode(docenteDto.getPassword()));
 		docente.setMaterie(getSetMaterie(docenteDto));
 		docente.setCodiceFiscale(docenteDto.getCodiceFiscale());
+		docente.setClassi(getListaClassiDocente(docenteDto.getSezioni()));
 		return docente;
+	}
+	
+	private List<Classe> getListaClassiDocente(List<String> sezioni){
+		return sezioni.stream()
+				.map(x -> {
+					Classe classe = classRepository.findBySezione(x)
+							.orElseThrow(() -> new NotFoundClasseException("Classe non trovata"));
+					return classe;
+				})
+				.collect(Collectors.toList());
 	}
 	
 	private List<String> getStringMaterie(Docente docente) {

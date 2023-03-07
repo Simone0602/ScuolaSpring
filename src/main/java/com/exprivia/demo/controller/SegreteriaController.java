@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.dto.MateriaDto;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.service.SegreteriaService;
@@ -74,7 +75,9 @@ public class SegreteriaController {
 		try {
 			String message = segreteriaService.saveDocente(docenteDto);
 			return new ResponseEntity<>(message, HttpStatus.CREATED);
-		}catch (NotFoundDocenteException e) {
+		} catch (NotFoundDocenteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		} catch (NotFoundClasseException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
 		}
 	}

@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.exprivia.demo.exception.DontSendEmailException;
+import com.exprivia.demo.dto.ContattaciDto;
 
 @Service
 public class SendMailService {
@@ -21,7 +21,6 @@ public class SendMailService {
 		this.javaMailSender = javaMailSender;
 	}
 	
-	@SuppressWarnings("unused")
 	public String sendEmail(String email, String token, String tipoUser) throws UnsupportedEncodingException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		
@@ -32,8 +31,6 @@ public class SendMailService {
 				helper.setTo(email);
 				helper.setSubject("Reset password");
 				helper.setText(generateTextMailRecoverPass(token, tipoUser), true);
-			}else {
-				throw new DontSendEmailException("Errore nell'invio dell'Email");
 			}
 		}catch(MessagingException e) {
 			e.printStackTrace();
@@ -41,6 +38,23 @@ public class SendMailService {
 		javaMailSender.send(message);
 		return "Email inviata a: " + email + "! Si prega di controllare la posta elettronica";
 	}
+	
+
+	public String sendSupportMail(ContattaciDto contattaciDto) throws UnsupportedEncodingException, MessagingException {
+		MimeMessage message = javaMailSender.createMimeMessage();
+		
+		MimeMessageHelper helper = new MimeMessageHelper(message, true);
+		if(helper != null) {
+			helper.setFrom(contattaciDto.getMail());
+			helper.setTo("scuola.spring@gmail.com");
+			helper.setSubject("Richiesta di supporto");
+			helper.setText(contattaciDto.getDescrizione(), true);
+		}
+	
+		javaMailSender.send(message);
+		return "Richiesta di supporto inviata. Grazie per averci segnalato un errore, cercheremo di risolverlo il prima possibile";
+	}
+	
 	private String generateTextMailRecoverPass(String token, String tipoUser) {
 		String text = "<strong>Recupero password</strong>"
 				+ "<div>"
