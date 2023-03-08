@@ -161,6 +161,7 @@ public class SegreteriaService {
 		docenteDto.setPassword(docente.getPass());
 		docenteDto.setCodiceFiscale(docente.getCodiceFiscale());
 		docenteDto.setMaterie(getStringMaterie(docente));
+		docenteDto.setSezioni(getListSezioniDocente(docente.getClassi()));
 		return docenteDto;
 	}
 	
@@ -184,6 +185,12 @@ public class SegreteriaService {
 							.orElseThrow(() -> new NotFoundClasseException("Classe non trovata"));
 					return classe;
 				})
+				.collect(Collectors.toList());
+	}
+	
+	private List<String> getListSezioniDocente(List<Classe> classi){
+		return classi.stream()
+				.map(x -> x.getSezione())
 				.collect(Collectors.toList());
 	}
 	
