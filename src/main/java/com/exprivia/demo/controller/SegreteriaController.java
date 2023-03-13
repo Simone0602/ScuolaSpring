@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.dto.MateriaDto;
 import com.exprivia.demo.dto.StudenteDto;
+import com.exprivia.demo.exception.IllegalDatiException;
 import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
 import com.exprivia.demo.exception.NotFoundStudentException;
@@ -79,6 +81,39 @@ public class SegreteriaController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
 		} catch (NotFoundClasseException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+	}
+	
+	@PutMapping(path = "/update-studente")
+	public ResponseEntity<String> updateStudente(@RequestBody StudenteDto studenteDto) {
+		try {
+			String message = segreteriaService.updateStudent(studenteDto);
+			return new ResponseEntity<>(message, HttpStatus.CREATED);
+		} catch (NotFoundStudentException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (NotFoundClasseException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (IllegalDatiException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+	
+	/* update docente tramite dati anagrafici */
+	@PutMapping(path = "/update-docente")
+	public ResponseEntity<String> updateDocente(@RequestBody DocenteDto docenteDto) {
+		try {
+			String message = segreteriaService.updateDocente(docenteDto);
+			return new ResponseEntity<>(message, HttpStatus.CREATED);
+		} catch (NotFoundDocenteException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (NotFoundClasseException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (IllegalDatiException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
 	}
 	

@@ -77,8 +77,8 @@ public class DocenteService {
 		return conversioneDocente_DocenteDto(docente);
 	}
 	
-	/* update studente tramite dati anagrafici */
-	//aggiorna studente
+	/* update docente tramite dati anagrafici */
+	//aggiorna docente
 	public String updateDocente(DocenteDto docenteDto) {
 		Docente docente = docenteRepository.findDocenteByCodiceFiscale(docenteDto.getCodiceFiscale())
 				.orElseThrow(() -> new NotFoundDocenteException("Docente non trovato"));
