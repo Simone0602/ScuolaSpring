@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "docenti")
 public class Docente implements UserDetails{

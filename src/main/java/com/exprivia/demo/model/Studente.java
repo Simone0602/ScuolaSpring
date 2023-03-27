@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+@SuppressWarnings("serial")
 @Entity
 @Table(name = "studenti")
 public class Studente implements UserDetails{
