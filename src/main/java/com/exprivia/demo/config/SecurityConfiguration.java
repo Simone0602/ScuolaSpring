@@ -37,7 +37,6 @@ public class SecurityConfiguration{
 			.antMatchers("/auth/**",
 					"/contattaci/**",
 					"/segreteria/**",
-					"/swagger-ui/**",
 					"/classe/find-all", 
 					"/docente/find-all",
 					"/docente/send-mail/**",
@@ -45,6 +44,12 @@ public class SecurityConfiguration{
 					"/studente/send-mail/**",
 					"/studente/update-password/**")
 			.permitAll()
+			.antMatchers("/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-resources/**",
+                    "/webjars/**")
+            .permitAll()
 			.anyRequest()
 			.authenticated()
 			.and()
