@@ -3,6 +3,7 @@ package com.exprivia.demo.controller;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,15 +29,12 @@ import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "docente")
 public class DocenteController {
 
 	private final DocenteService service;
-
-	public DocenteController(DocenteService service) {
-		this.service = service;
-	}
 
 	// SERVE ALLO STUDENTE PER VEDERE TUTTI GLI INSEGNANTI
 	@GetMapping(path = "/find-all")

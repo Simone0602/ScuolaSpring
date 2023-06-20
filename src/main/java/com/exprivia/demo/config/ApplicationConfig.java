@@ -2,6 +2,7 @@ package com.exprivia.demo.config;
 
 import java.util.Optional;
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,27 +20,20 @@ import com.exprivia.demo.repository.DocenteRepo;
 import com.exprivia.demo.repository.StudentRepo;
 
 @Configuration
+@AllArgsConstructor
 public class ApplicationConfig {
 	
 	private final StudentRepo studentRepository;
 	private final DocenteRepo docenteRepository;
-	
-	public ApplicationConfig(StudentRepo studentRepository, DocenteRepo docenteRepository) {
-		this.studentRepository = studentRepository;
-		this.docenteRepository = docenteRepository;
-	}
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return new UserDetailsService() {
-			@Override
-			public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-				Optional<Studente> studente = studentRepository.findStudentByUserCode(username);
-				if(studente.isPresent()) {
-					return studente.get();
-				}else {
-					return docenteRepository.findDocenteByCodiceFiscale(username).get();
-				}
+		return username -> {
+			Optional<Studente> studente = studentRepository.findStudentByUserCode(username);
+			if(studente.isPresent()) {
+				return studente.get();
+			}else {
+				return docenteRepository.findDocenteByCodiceFiscale(username).get();
 			}
 		};
 	}

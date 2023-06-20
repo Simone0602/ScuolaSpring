@@ -2,6 +2,7 @@ package com.exprivia.demo.controller;
 
 import java.io.UnsupportedEncodingException;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,16 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.exprivia.demo.dto.ContattaciDto;
 import com.exprivia.demo.mail.SendMailService;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "contattaci")
 public class ContattaciController {
 	
 	private final SendMailService mailService;
-
-	public ContattaciController(SendMailService mailService) {
-		super();
-		this.mailService = mailService;
-	}
 	
 	@PostMapping(path = "/send-mail")
 	public ResponseEntity<String> sendSupportMail(@RequestBody ContattaciDto contattaciDto){

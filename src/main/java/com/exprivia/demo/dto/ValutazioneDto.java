@@ -1,46 +1,19 @@
 package com.exprivia.demo.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class ValutazioneDto {
 
 	private String materia;
-	private float voto;
+	private double voto;
 	private LocalDate data;
-
-	public ValutazioneDto() {
-		super();
-	}
-
-	public ValutazioneDto(String materia, float voto, LocalDate data) {
-		super();
-		this.materia = materia;
-		this.voto = voto;
-		this.data = data;
-	}
-
-	public float getVoto() {
-		return voto;
-	}
-
-	public void setVoto(float voto) {
-		this.voto = voto;
-	}
-
-	public LocalDate getData() {
-		return data;
-	}
-
-	public void setData(LocalDate data) {
-		this.data = data;
-	}
-
-	public String getMateria() {
-		return materia;
-	}
-
-	public void setMateria(String materia) {
-		this.materia = materia;
-	}
-
 }

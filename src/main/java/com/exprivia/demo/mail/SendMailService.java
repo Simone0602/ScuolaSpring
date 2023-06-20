@@ -5,21 +5,17 @@ import java.io.UnsupportedEncodingException;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ContattaciDto;
 
+@AllArgsConstructor
 @Service
 public class SendMailService {
 	private final JavaMailSender javaMailSender;
-	
-	@Autowired
-	public SendMailService(JavaMailSender javaMailSender) {
-		this.javaMailSender = javaMailSender;
-	}
 	
 	public String sendEmail(String email, String token, String tipoUser) throws UnsupportedEncodingException {
 		MimeMessage message = javaMailSender.createMimeMessage();

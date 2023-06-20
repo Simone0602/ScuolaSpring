@@ -1,22 +1,10 @@
 package com.exprivia.demo.service;
 
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.exprivia.demo.dto.AssenzaDto;
 import com.exprivia.demo.dto.RegistroFamiglia;
 import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.dto.ValutazioneDto;
 import com.exprivia.demo.exception.IllegalDatiException;
-import com.exprivia.demo.exception.IllegalMailException;
 import com.exprivia.demo.exception.NotFoundSezioneException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.exception.NotFoundTokenException;
@@ -29,8 +17,19 @@ import com.exprivia.demo.repository.AssenzaRepository;
 import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.StudentRepo;
 import com.exprivia.demo.repository.TokenRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class StudentService {
 
 	private final StudentRepo studentRepository;
@@ -39,21 +38,6 @@ public class StudentService {
 	private final AssenzaRepository assenzaRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final SendMailService mailService;
-
-	@Autowired
-	public StudentService(StudentRepo studentRepository, 
-			ClassRepository classRepository, 
-			TokenRepository tokenRepository,
-			 AssenzaRepository assenzaRepository,
-			PasswordEncoder passwordEncoder,
-			SendMailService mailService) {
-		this.studentRepository = studentRepository;
-		this.classRepository = classRepository;
-		this.tokenRepository = tokenRepository;
-		this.assenzaRepository = assenzaRepository;
-		this.passwordEncoder = passwordEncoder;
-		this.mailService = mailService;
-	}
 	
 	/* get studente */
 	public StudenteDto getStudent(String userCode) {
@@ -71,10 +55,6 @@ public class StudentService {
 	public String resetPassword(StudenteDto studenteDto) throws UnsupportedEncodingException {
 		Studente studente = studentRepository.findStudentByUserCode(studenteDto.getUserCode())
 				.orElseThrow(() -> new NotFoundStudentException("Studente non trovato"));
-		
-		if(!studente.getMail().equals(studenteDto.getMail())) {
-			throw new IllegalMailException("Email errata");
-		}
 		
 		UUID uuid = UUID.randomUUID();
 		String resetToken = uuid.toString();
@@ -94,7 +74,7 @@ public class StudentService {
 		studente.setPass(passwordEncoder.encode(password));
 		
 		studentRepository.save(studente);
-		tokenRepository.delete(newToken);
+		tokenRepository.deleteTokenByStudenteId(studente.getId());
 		return "Password aggiornata";
 	}
 	

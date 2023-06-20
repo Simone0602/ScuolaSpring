@@ -1,19 +1,16 @@
 package com.exprivia.demo;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableAutoConfiguration
 @OpenAPIDefinition(
     info = @Info(
-        title = "Sito scolastico",
+        title = "Server",
         version = "1.0",
-        description = "Progetto di prova per la creazione di un server utilizzato dal frontend per la comunicazione tra client e database"
+        description = "Server sito scolastico"
     )
 )
 public class ProgettoExpriviaApplication {

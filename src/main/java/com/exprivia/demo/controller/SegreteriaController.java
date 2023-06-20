@@ -1,18 +1,5 @@
 package com.exprivia.demo.controller;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.dto.MateriaDto;
 import com.exprivia.demo.dto.StudenteDto;
@@ -21,16 +8,19 @@ import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.exception.NotFoundDocenteException;
 import com.exprivia.demo.exception.NotFoundStudentException;
 import com.exprivia.demo.service.SegreteriaService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "segreteria")
 public class SegreteriaController {
 	
 	private final SegreteriaService segreteriaService;
-
-	public SegreteriaController(SegreteriaService segreteriaService) {
-		this.segreteriaService = segreteriaService;
-	}
 	
 	@GetMapping(path = "find-all-materie")
 	public ResponseEntity<Object> findAllMaterie() {

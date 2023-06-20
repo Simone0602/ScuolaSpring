@@ -1,24 +1,9 @@
 package com.exprivia.demo.service;
 
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.exprivia.demo.dto.ClasseDto;
 import com.exprivia.demo.dto.DocenteDto;
 import com.exprivia.demo.enums.Materie;
-import com.exprivia.demo.exception.IllegalDatiException;
-import com.exprivia.demo.exception.IllegalMailException;
-import com.exprivia.demo.exception.NotFoundClasseException;
-import com.exprivia.demo.exception.NotFoundDocenteException;
-import com.exprivia.demo.exception.NotFoundStudentException;
-import com.exprivia.demo.exception.NotFoundTokenException;
+import com.exprivia.demo.exception.*;
 import com.exprivia.demo.mail.SendMailService;
 import com.exprivia.demo.model.Classe;
 import com.exprivia.demo.model.Docente;
@@ -28,8 +13,19 @@ import com.exprivia.demo.repository.ClassRepository;
 import com.exprivia.demo.repository.DocenteRepo;
 import com.exprivia.demo.repository.MateriaRepository;
 import com.exprivia.demo.repository.TokenRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class DocenteService {
 
 	private final ClassRepository classRepository;
@@ -38,20 +34,6 @@ public class DocenteService {
 	private final TokenRepository tokenRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final SendMailService mailService;
-
-	public DocenteService(DocenteRepo docenteRepository,
-			ClassRepository classRepository,
-			MateriaRepository materiaRepository,
-			TokenRepository tokenRepository, 
-			PasswordEncoder passwordEncoder,
-			SendMailService mailService) {
-		this.docenteRepository = docenteRepository;
-		this.classRepository = classRepository;
-		this.materiaRepository = materiaRepository;
-		this.tokenRepository = tokenRepository;
-		this.passwordEncoder = passwordEncoder;
-		this.mailService = mailService;
-	}
 
 	// SERVE ALLO STUDENTE
 	// TROVA TUTTI I DOCENTI
@@ -127,7 +109,7 @@ public class DocenteService {
 		docente.setPass(passwordEncoder.encode(password));
 
 		docenteRepository.save(docente);
-		tokenRepository.delete(newToken);
+		tokenRepository.deleteTokenByDocenteId(docente.getId());
 		return "Password aggiornata";
 	}
 	

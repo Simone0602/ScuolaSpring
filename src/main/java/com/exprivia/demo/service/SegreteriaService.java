@@ -1,9 +1,12 @@
 package com.exprivia.demo.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,7 @@ import com.exprivia.demo.repository.TokenRepository;
 import com.exprivia.demo.repository.ValutazioneRepository;
 
 @Service
+@AllArgsConstructor
 public class SegreteriaService {
 	private final StudentRepo studentRepository;
 	private final TokenRepository tokenRepository;
@@ -38,32 +42,18 @@ public class SegreteriaService {
 	private final MateriaRepository materiaRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public SegreteriaService(StudentRepo studentRepository, TokenRepository tokenRepository,
-			ValutazioneRepository valutazioneRepository, AssenzaRepository assenzaRepository,
-			DocenteRepo docenteRepository, ClassRepository classRepository, MateriaRepository materiaRepository,
-			PasswordEncoder passwordEncoder) {
-		this.studentRepository = studentRepository;
-		this.tokenRepository = tokenRepository;
-		this.valutazioneRepository = valutazioneRepository;
-		this.assenzaRepository = assenzaRepository;
-		this.docenteRepository = docenteRepository;
-		this.classRepository = classRepository;
-		this.materiaRepository = materiaRepository;
-		this.passwordEncoder = passwordEncoder;
-	}
-
 	public List<MateriaDto> findAllMaterie() {
 		return materiaRepository.findAll().stream().map(x -> new MateriaDto(x.getMateria().name().toLowerCase()))
 				.collect(Collectors.toList());
 	}
 
 	public List<StudenteDto> findAllStudent() {
-		return studentRepository.findAll().stream().map(x -> conversioneStudente_StudenteDto(x))
+		return studentRepository.findAll().stream().map(this::conversioneStudente_StudenteDto)
 				.collect(Collectors.toList());
 	}
 
 	public List<DocenteDto> findAllDocenti() {
-		return docenteRepository.findAll().stream().map(x -> conversioneDocente_DocenteDto(x))
+		return docenteRepository.findAll().stream().map(this::conversioneDocente_DocenteDto)
 				.collect(Collectors.toList());
 	}
 
@@ -211,7 +201,7 @@ public class SegreteriaService {
 	}
 
 	private List<String> getListSezioniDocente(List<Classe> classi) {
-		return classi.stream().map(x -> x.getSezione()).collect(Collectors.toList());
+		return classi.stream().map(Classe::getSezione).collect(Collectors.toList());
 	}
 
 	private List<String> getStringMaterie(Docente docente) {
@@ -220,7 +210,7 @@ public class SegreteriaService {
 
 	private Set<Materia> getSetMaterie(DocenteDto docenteDto) {
 		return docenteDto.getMaterie().stream()
-				.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x.toUpperCase()))).filter(x -> x != null)
+				.map(x -> this.materiaRepository.findByMateria(Materie.valueOf(x.toUpperCase()))).filter(Objects::nonNull)
 				.collect(Collectors.toSet());
 	}
 }

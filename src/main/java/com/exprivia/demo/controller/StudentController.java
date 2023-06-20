@@ -1,42 +1,27 @@
 package com.exprivia.demo.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.exprivia.demo.dto.AssenzaDto;
 import com.exprivia.demo.dto.RegistroFamiglia;
 import com.exprivia.demo.dto.StudenteDto;
-import com.exprivia.demo.exception.IllegalDatiException;
-import com.exprivia.demo.exception.IllegalMailException;
-import com.exprivia.demo.exception.IllegalPasswordException;
-import com.exprivia.demo.exception.NotFoundClasseException;
-import com.exprivia.demo.exception.NotFoundStudentException;
-import com.exprivia.demo.exception.NotFoundTokenException;
+import com.exprivia.demo.exception.*;
 import com.exprivia.demo.service.StudentService;
-
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "studente")
 public class StudentController {
 
 	private final StudentService service;
-
-	public StudentController(StudentService service) {
-		this.service = service;
-	}
 	
 	/* get studente */
 	@GetMapping(path = "/{userCode}/get-studente")
@@ -72,9 +57,7 @@ public class StudentController {
 		try {
 			String message = service.updatePassword(password, token);
 			return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
-		} catch (NotFoundTokenException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		} catch (NotFoundStudentException e) {
+		} catch (NotFoundTokenException | NotFoundStudentException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
@@ -87,18 +70,16 @@ public class StudentController {
 
 		Message.creator(new PhoneNumber("+393895414759"), new PhoneNumber("+15005550006"), "prova messaggio").create();
 
-		return new ResponseEntity<String>("Invio messaggio riuscito", HttpStatus.OK);
+		return new ResponseEntity<>("Invio messaggio riuscito", HttpStatus.OK);
 	}
 
-	/* update studente tramite dati anagrici */
+	/* update studente tramite dati anagrafici */
 	@PutMapping(path = "/update")
 	public ResponseEntity<String> updateStudente(@RequestBody StudenteDto studenteDto) {
 		try {
 			String message = service.updateStudent(studenteDto);
 			return new ResponseEntity<>(message, HttpStatus.CREATED);
-		} catch (NotFoundStudentException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		} catch (NotFoundClasseException e) {
+		} catch (NotFoundStudentException | NotFoundClasseException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		} catch (IllegalDatiException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);

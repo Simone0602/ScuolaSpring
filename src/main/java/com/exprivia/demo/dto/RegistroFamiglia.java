@@ -1,24 +1,16 @@
 package com.exprivia.demo.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class RegistroFamiglia {
 	private List<ValutazioneDto> listaVoti;
-
-	public RegistroFamiglia() {
-	}
-
-	public RegistroFamiglia(StudenteDto studenteDto, List<ValutazioneDto> listaVoti) {
-		super();
-		this.listaVoti = listaVoti;
-	}
-
-	public List<ValutazioneDto> getListaVoti() {
-		return listaVoti;
-	}
-
-	public void setListaVoti(List<ValutazioneDto> listaVoti) {
-		this.listaVoti = listaVoti;
-	}
-
 }

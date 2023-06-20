@@ -2,6 +2,7 @@ package com.exprivia.demo.controller;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,15 +15,12 @@ import com.exprivia.demo.dto.StudenteDto;
 import com.exprivia.demo.exception.NotFoundClasseException;
 import com.exprivia.demo.service.ClassService;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "classe")
 public class ClassController {
 
 	private final ClassService service;
-
-	public ClassController(ClassService service) {
-		this.service = service;
-	}
 	
 	//TROVA TUTTE LE CLASSI
 	@GetMapping(path = "/find-all")

@@ -1,5 +1,14 @@
 package com.exprivia.demo.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class StudenteDto {
 
 	private long id;
@@ -9,74 +18,4 @@ public class StudenteDto {
 	private String password;
 	private String userCode;
 	private String sezione;
-
-	public StudenteDto() {
-	}
-
-	public StudenteDto(Long id, String nome, String cognome, String mail, String password, String userCode, String sezione) {
-		super();
-		this.id = id;
-		this.nome = nome;
-		this.cognome = cognome;
-		this.mail = mail;
-		this.password = password;
-		this.userCode = userCode;
-		this.sezione = sezione;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getSezione() {
-		return sezione;
-	}
-
-	public void setSezione(String sezione) {
-		this.sezione = sezione;
-	}
-
-	public String getNome() {
-		return nome;
-	}
-
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-
-	public String getCognome() {
-		return cognome;
-	}
-
-	public void setCognome(String cognome) {
-		this.cognome = cognome;
-	}
-
-	public String getMail() {
-		return mail;
-	}
-
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getUserCode() {
-		return userCode;
-	}
-
-	public void setUserCode(String userCode) {
-		this.userCode = userCode;
-	}
 }

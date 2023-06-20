@@ -3,6 +3,7 @@ package com.exprivia.demo.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.exprivia.demo.dto.ClasseDto;
@@ -13,12 +14,9 @@ import com.exprivia.demo.model.Studente;
 import com.exprivia.demo.repository.ClassRepository;
 
 @Service
+@AllArgsConstructor
 public class ClassService {
 	private final ClassRepository repository;
-
-	public ClassService(ClassRepository repository) {
-		this.repository = repository;
-	}
 
 	//TROVA TUTTE LE CLASSI
 	public List<ClasseDto> findAllClassi() {

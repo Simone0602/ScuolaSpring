@@ -3,6 +3,7 @@ package com.exprivia.demo.auth;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,7 @@ import com.exprivia.demo.repository.MateriaRepository;
 import com.exprivia.demo.repository.StudentRepo;
 
 @Service
+@AllArgsConstructor
 public class AuthenticationService {
 	private final StudentRepo studentRepository;
 	private final ClassRepository classRepository;
@@ -32,24 +34,6 @@ public class AuthenticationService {
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final JwtService jwtService;
-	
-	public AuthenticationService(
-			StudentRepo studentRepository, 
-			ClassRepository classRepository,
-			DocenteRepo docenteRepo,
-			MateriaRepository materiaRepository,
-			PasswordEncoder passwordEncoder,  
-			AuthenticationManager authenticationManager,
-			JwtService jwtService
-	) {
-		this.studentRepository = studentRepository;
-		this.classRepository = classRepository;
-		this.docenteRepo = docenteRepo;
-		this.materiaRepository = materiaRepository;
-		this.passwordEncoder = passwordEncoder;
-		this.authenticationManager = authenticationManager;
-		this.jwtService = jwtService;
-	}
 
 	public AuthenticationResponse registerStudente(StudenteDto request) {
 		Classe classe = classRepository.findBySezione(request.getSezione())
@@ -64,7 +48,7 @@ public class AuthenticationService {
 		studente.setUserCode(request.getUserCode());
 		studentRepository.save(studente);
 
-		var jwtToken = jwtService.generateToken(studente);
+		String jwtToken = jwtService.generateToken(studente);
 		AuthenticationResponse authResponse = new AuthenticationResponse(jwtToken, "studente");
 		return authResponse;
 	}
@@ -85,7 +69,7 @@ public class AuthenticationService {
 		docente.setMaterie(materie);
 		docenteRepo.save(docente);
 		
-		var jwtToken = jwtService.generateToken(docente);
+		String jwtToken = jwtService.generateToken(docente);
 		AuthenticationResponse authResponse = new AuthenticationResponse(jwtToken, "docente");
 		return authResponse;
 	}
@@ -97,9 +81,9 @@ public class AuthenticationService {
 					request.getPassword()
 			)
 		);
-		var studente = studentRepository.findStudentByUserCode(request.getUserCode())
+		Studente studente = studentRepository.findStudentByUserCode(request.getUserCode())
 				.orElseThrow();
-		var jwtToken = jwtService.generateToken(studente);
+		String jwtToken = jwtService.generateToken(studente);
 		AuthenticationResponse authResponse = new AuthenticationResponse(jwtToken, "studente");
 		return authResponse;
 	}
@@ -111,9 +95,9 @@ public class AuthenticationService {
 					request.getPassword()
 			)
 		);
-		var docente = docenteRepo.findDocenteByCodiceFiscale(request.getCodiceFiscale())
+		Docente docente = docenteRepo.findDocenteByCodiceFiscale(request.getCodiceFiscale())
 				.orElseThrow();
-		var jwtToken = jwtService.generateToken(docente);
+		String jwtToken = jwtService.generateToken(docente);
 		AuthenticationResponse authResponse = new AuthenticationResponse(jwtToken, "docente");
 		return authResponse;
 	}
